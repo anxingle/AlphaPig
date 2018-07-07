@@ -117,14 +117,15 @@ class TrainPipeline():
         for i in range(n_games):
             warning, winner, play_data = self.game.start_self_play(self.mcts_player, temp=self.temp, sgf_home=self._sgf_home, file_name=self._training_data[data_index])
             if warning:
-                _logger.error('training_index: %s, file: %s' % (training_index, self._training_data[data_index]))
-            _logger.info('winner: %s, file: %s ' % (winner, self._training_data[data_index]))
-            # print('play_data:  ', play_data)
-            play_data = list(play_data)[:]
-            self.episode_len = len(play_data)
-            # augment the data
-            play_data = self.get_equi_data(play_data)
-            self.data_buffer.extend(play_data)
+                _logger.error('\033[0;41m %s \033[0m anxingle_training_index: %s, data_index: %s, file: %s' % ('WARNING', training_index, data_index, self._training_data[data_index]))
+            else:
+                _logger.info('winner: %s, file: %s ' % (winner, self._training_data[data_index]))
+                # print('play_data:  ', play_data)
+                play_data = list(play_data)[:]
+                self.episode_len = len(play_data)
+                # augment the data
+                play_data = self.get_equi_data(play_data)
+                self.data_buffer.extend(play_data)
         _logger.info('game_batch_index: %s, length of data_buffer: %s' % (training_index, len(self.data_buffer)))
         #print(len(self.data_buffer), n_games)
 

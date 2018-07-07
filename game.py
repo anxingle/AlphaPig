@@ -262,7 +262,12 @@ class Game(object):
             mcts_probs.append(move_probs)
             current_players.append(self.board.current_player)
             # perform a move
-            self.board.do_move(move)
+            try:
+                self.board.do_move(move)
+            except Exception as ee:
+                _logger.error("\033[40;31m %s \033[0m: anxingle file_name: %s, move:  %s" %('WARNING', file_name, move) )
+                warning, winner, mcts_probs = 1, None, None
+                return warning, winner, mcts_probs
             if is_shown:
                 self.graphic(self.board, p1, p2)
             # go_on= input('go on:')
