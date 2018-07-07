@@ -279,7 +279,7 @@ class Game(object):
                 except Exception as e:
                     # 倘若进入了这个“bug”, 则不用报告warning
                     warning = 0
-                    print(e)
+                    # print('you can ignore: ', e)
             # end, winner = self.board.game_end()
             if end:
                 # winner from the perspective of the current player of each state

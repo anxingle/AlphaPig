@@ -219,7 +219,7 @@ class TrainPipeline():
         try:
             for i in range(self.game_batch_num):
                 current_time = time.time()
-                self.collect_selfplay_data(1, training_index = i)
+                self.collect_selfplay_data(1, training_index=i)
                 _logger.info('collection cost time: %d ' % (time.time() - current_time))
                 _logger.info("batch i:{}, episode_len:{}, buffer_len:{}".format(
                         i+1, self.episode_len, len(self.data_buffer)))
