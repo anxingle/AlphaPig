@@ -115,7 +115,7 @@ class TrainPipeline():
         """collect self-play data for training"""
         data_index = training_index % self._length_train_data
         for i in range(n_games):
-            warning, winner, play_data = self.game.start_self_play(self.mcts_player, temp=self.temp, self._sgf_home, self._training_data[data_index])
+            warning, winner, play_data = self.game.start_self_play(self.mcts_player, temp=self.temp, sgf_home=self._sgf_home, file_name=self._training_data[data_index])
             if warning:
                 _logger.error('training_index: %s, file: %s' % (training_index, self._training_data[data_index]))
             _logger.info('winner: %s, file: %s ' % (winner, self._training_data[data_index]))
