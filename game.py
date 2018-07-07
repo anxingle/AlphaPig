@@ -5,9 +5,12 @@
 
 from __future__ import print_function
 import numpy as np
+import os
 from policy_value_net_mxnet import PolicyValueNet # Keras
 from mcts_alphaZero import MCTSPlayer
+from utils import sgf_dataIter
 
+current_relative_path = lambda x: os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), x))
 
 class Board(object):
     """board for the game"""
@@ -219,26 +222,27 @@ class Game(object):
                         print("Game end. Tie")
                 return winner
 
-"""
-winner, play_data = self.game.start_self_play(self.mcts_player,
-                                                          temp=self.temp, self._sgf_home, self._training_data[data_index])
-"""
-    def start_self_play(self, player, is_shown=1, temp=1e-3):
+
+    def start_self_play(self, player, is_shown=0, temp=1e-3, sgf_home=None, file_name=None):
         """ start a self-play game using a MCTS player, reuse the search tree,
         and store the self-play data: (state, mcts_probs, z) for training
         """
+        # 获取棋盘数据
+        X_train = sgf_dataIter.get_data_from_files(file_name, sgf_home)
+        data_length = len(X_train['seq_num_list'])   # 对弈长度（一盘棋盘数据的长度）
         self.board.init_board()
         p1, p2 = self.board.players
         print('p1: ', p1, '   p2:  ', p2)
         states, mcts_probs, current_players = [], [], []
-        while True:
-            move, move_probs = player.get_action(self.board,
+        # while True:
+        for num_index, move in enumerate(X_train['seq_num_list']):
+            move_, move_probs = player.get_action(self.board,
                                                  temp=temp,
                                                  return_prob=1)
             print('move:   ')
             print(move)
             print('move probs: ')
-            print(move_probs)
+            # print(move_probs)
             print(type(move_probs))
             print(move_probs.shape)
             # store the data
@@ -251,10 +255,22 @@ winner, play_data = self.game.start_self_play(self.mcts_player,
             self.board.do_move(move)
             if is_shown:
                 self.graphic(self.board, p1, p2)
-            go_on= input('go on:')
-            if go_on == 1:
-                break
-            end, winner = self.board.game_end()
+            # go_on= input('go on:')
+            # if go_on == 1:
+            #     break
+            # 既然使用现成的棋局文件， end判断当然也需要重新设置
+            end, warning = 0, 1
+            if num_index + 1 == data_length:
+                end = 1
+                winner = X_train['winner']
+                try:
+                    # 这是一个故意的“bug”，目的在于检验是否end
+                    print('seq_num_list ...', X_train['seq_num_list'][num_index+1])
+                except Exception as e:
+                    # 倘若进入了这个“bug”, 则不用报告warning
+                    warning = 0
+                    print(e)
+            # end, winner = self.board.game_end()
             if end:
                 # winner from the perspective of the current player of each state
                 winners_z = np.zeros(len(current_players))
@@ -268,8 +284,12 @@ winner, play_data = self.game.start_self_play(self.mcts_player,
                         print("Game end. Winner is player:", winner)
                     else:
                         print("Game end. Tie")
-                go_on = input('go on:')
-                return winner, zip(states, mcts_probs, winners_z)
+                # go_on = input('go on:')
+                # winner 1:2
+                print('winner: ', winner)
+                print(X_train['file_name'])
+                return warning, winner, zip(states, mcts_probs, winners_z)
+
 
 if __name__ == '__main__':
     model_file = 'current_policy.model'
@@ -280,6 +300,8 @@ if __name__ == '__main__':
                                       is_selfplay=1)
     board = Board(width=15, height=15, n_in_row=5)
     game = Game(board)
-    winner, play_data = game.start_self_play(mcts_player, temp=1.0)
+    sgf_home = current_relative_path('./sgf_data')
+    file_name = '1000_white_.sgf'
+    winner, play_data = game.start_self_play(mcts_player, is_shown=1, temp=1.0, sgf_home=sgf_home, file_name=file_name)
 
 

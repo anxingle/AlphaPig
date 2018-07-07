@@ -8,8 +8,8 @@ Tested under Keras 2.0.5 with tensorflow-gpu 1.2.1 as backend
 from __future__ import print_function
 import sys
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6,7"
-sys.path.insert(0, '/home/mingzhang/work/dmlc/python_mxnet/python')
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6,7"
+# sys.path.insert(0, '/home/mingzhang/work/dmlc/python_mxnet/python')
 
 import mxnet as mx
 import numpy as np
@@ -18,9 +18,9 @@ import pickle
 
 class PolicyValueNet():
     """policy-value network """
-    def __init__(self, board_width, board_height, model_params=None):
+    def __init__(self, board_width, board_height, batch_size=512, model_params=None):
         self.context = mx.cpu()
-        self.batchsize = 512*23 #must same to the TrainPipeline's self.batch_size.
+        self.batchsize = batch_size  #must same to the TrainPipeline's self.batch_size.
         self.channelnum = 9
         self.board_width = board_width
         self.board_height = board_height 

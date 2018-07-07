@@ -1,0 +1,59 @@
+# 数据目录
+sgf_dir: './sgf_data'
+# 棋盘设置
+board_width: 15
+board_height: 15
+n_in_row: 5
+# 学习率
+learn_rate: 0.0004
+# 根据KL散度动态调整学习率
+lr_multiplier: 1.0
+temp: 1.0
+# 每次移动的simulations数
+n_playout: 200
+# TODO: 蒙特卡洛树模拟选择时更多的依靠先验，C_put影响选择的程度？
+c_puct: 5
+# 数据集最大量（双端队列长度）
+buffer_size: 1228800
+batch_size: 2
+epochs: 8
+play_batch_size: 1
+# KL散度
+kl_targ: 0.02
+# 每check_freq次 检测对弈成绩
+check_freq: 500
+# 检测成绩用的mcts对手的思考深度
+pure_mcts_playout_num: 1000
+# 训练多少轮
+game_batch_num: 14000
+
+
+# 训练日志
+train_logging:
+    version: 1
+    formatters:
+        simpleFormater:
+            format: '%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s'
+            datefmt: '%Y-%m-%d %H:%M:%S'
+    handlers:
+        # 标准输出，只要级别在DEBUG以上就会输出
+        console:
+            class: logging.StreamHandler
+            formatter: simpleFormater
+            level: DEBUG
+            stream: ext://sys.stdout
+        # INFO以上，滚动文件，保留20个，每个最大100MB
+        info_file_handler:
+            class : logging.FileHandler
+            formatter: simpleFormater
+            level: INFO
+            filename: ./logs/info.log
+        # ERROR以上
+        error_file_handler:
+            class : logging.FileHandler
+            formatter: simpleFormater
+            level: ERROR
+            filename: ./logs/error.log
+    root:
+        level: DEBUG
+        handlers: [console, info_file_handler, error_file_handler]

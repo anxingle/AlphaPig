@@ -8,64 +8,76 @@ An implementation of the training pipeline of AlphaZero for Gomoku
 from __future__ import print_function
 import pickle
 import random
+import os
+import time
 import numpy as np
 import multiprocessing as mp
 from collections import defaultdict, deque
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-import os
-import time
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6,7"
+from utils import *
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 # from policy_value_net import PolicyValueNet  # Theano and Lasagne
 # from policy_value_net_pytorch import PolicyValueNet  # Pytorch
 # from policy_value_net_tensorflow import PolicyValueNet # Tensorflow
 # from policy_value_net_keras import PolicyValueNet # Keras
-from policy_value_net_mxnet import PolicyValueNet # Keras
+from policy_value_net_mxnet import PolicyValueNet # Mxnet
+
+import logging
+import logging.config
+logging.config.dictConfig(config_['train_logging'])
+_logger = logging.getLogger(__name__)
+
+current_relative_path = lambda x: os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), x))
 
 
 class TrainPipeline():
-    def __init__(self, init_model=None):
+    def __init__(self, conf, init_model=None):
         # params of the board and the game
-        self.board_width = 8
-        self.board_height = 8
-        self.n_in_row = 4
+        self.board_width = conf['board_width']
+        self.board_height = conf['board_height']
+        self.n_in_row = conf['n_in_row']
         self.board = Board(width=self.board_width,
                            height=self.board_height,
                            n_in_row=self.n_in_row)
         self.game = Game(self.board)
         # training params
-        self.learn_rate = 4e-4
-        self.lr_multiplier = 1.0  # adaptively adjust the learning rate based on KL
-        self.temp = 1.0  # the temperature param
-        self.n_playout = 2 # 500  # num of simulations for each move
-        self.c_puct = 5
-        self.buffer_size = 1228800
-        self.batch_size = 512*2 # mini-batch size for training
+        self.learn_rate = conf['learn_rate']
+        self.lr_multiplier = conf['lr_multiplier']  # adaptively adjust the learning rate based on KL
+        self.temp = conf['temp']  # the temperature param
+        self.n_playout = conf['n_playout'] # 500  # num of simulations for each move
+        self.c_puct = conf['c_puct']
+        self.buffer_size = conf['buffer_size']
+        self.batch_size = conf['batch_size'] # mini-batch size for training
         self.data_buffer = deque(maxlen=self.buffer_size)
-        self.play_batch_size = 1
-        self.epochs = 8  # num of train_steps for each update
-        self.kl_targ = 0.02
-        self.check_freq = 500
-        self.game_batch_num = 40000
+        self.play_batch_size = conf['play_batch_size']
+        self.epochs = conf['epochs']  # num of train_steps for each update
+        self.kl_targ = conf['kl_targ']
+        self.check_freq = conf['check_freq']
+        self.game_batch_num =conf['game_batch_num']
         self.best_win_ratio = 0.0
         # 多线程相关
         self._cpu_count = mp.cpu_count() - 8
         # num of simulations used for the pure mcts, which is used as
         # the opponent to evaluate the trained policy
-        self.pure_mcts_playout_num = 1000
+        self.pure_mcts_playout_num = conf['pure_mcts_playout_num']
         # 训练集文件
-        self._sgf_home = './sgf_data'
+        self._sgf_home = current_relative_path(conf['sgf_dir'])
+        _logger.info('path: %s' % self._sgf_home)
         self._load_training_data(self._sgf_home)
         if init_model:
             # start training from an initial policy-value net
             self.policy_value_net = PolicyValueNet(self.board_width,
                                                    self.board_height,
+                                                   self.batch_size,
                                                    model_params=init_model)
         else:
             # start training from a new policy-value net
             self.policy_value_net = PolicyValueNet(self.board_width,
-                                                   self.board_height)
+                                                   self.board_height,
+                                                   self.batch_size)
         self.mcts_player = MCTSPlayer(self.policy_value_net.policy_value_fn,
                                       c_puct=self.c_puct,
                                       n_playout=self.n_playout,
@@ -75,6 +87,7 @@ class TrainPipeline():
         file_list = os.listdir(data_dir)
         self._training_data = [item for item in file_list if item.endswith('.sgf') and os.path.isfile(os.path.join(data_dir, item))]
         random.shuffle(self._training_data)
+        self._length_train_data = len(self._training_data)
 
     def get_equi_data(self, play_data):
         """augment the data set by rotation and flipping
@@ -100,19 +113,19 @@ class TrainPipeline():
 
     def collect_selfplay_data(self, n_games=1, training_index=None):
         """collect self-play data for training"""
-        data_index = training_index % len(self._training_data)
+        data_index = training_index % self._length_train_data
         for i in range(n_games):
-            winner, play_data = self.game.start_self_play(self.mcts_player,
-                                                          temp=self.temp, self._sgf_home, self._training_data[data_index])
-            print('\n')
-            print('***' * 10)
-            print('winner: ', winner)
+            warning, winner, play_data = self.game.start_self_play(self.mcts_player, temp=self.temp, self._sgf_home, self._training_data[data_index])
+            if warning:
+                _logger.error('training_index: %s, file: %s' % (training_index, self._training_data[data_index]))
+            _logger.info('winner: %s, file: %s ' % (winner, self._training_data[data_index]))
             # print('play_data:  ', play_data)
             play_data = list(play_data)[:]
             self.episode_len = len(play_data)
             # augment the data
             play_data = self.get_equi_data(play_data)
             self.data_buffer.extend(play_data)
+        _logger.info('game_batch_index: %s, length of data_buffer: %s' % (training_index, len(self.data_buffer)))
         #print(len(self.data_buffer), n_games)
 
     # def _multiprocess_collect_selfplay_data(self, q, process_index):
@@ -150,7 +163,7 @@ class TrainPipeline():
                     axis=1)
             )
             if kl > self.kl_targ * 4:  # early stopping if D_KL diverges badly
-                print('early stopping:', i, self.epochs)
+                _logger.info('early stopping. i:%s.   epochs: %s' % (i, self.epochs))
                 break
         # adaptively adjust the learning rate
         if kl > self.kl_targ * 2 and self.lr_multiplier > 0.05:
@@ -164,7 +177,7 @@ class TrainPipeline():
         explained_var_new = (1 -
                              np.var(np.array(winner_batch) - new_v.flatten()) /
                              np.var(np.array(winner_batch)))
-        print(("kl:{:.4f},"
+        _logger.info(("kl:{:.4f},"
                "lr:{:.1e},"
                "loss:{},"
                "entropy:{},"
@@ -196,7 +209,7 @@ class TrainPipeline():
                                           is_shown=0)
             win_cnt[winner] += 1
         win_ratio = 1.0*(win_cnt[1] + 0.5*win_cnt[-1]) / n_games
-        print("num_playouts:{}, win: {}, lose: {}, tie:{}".format(
+        _logger.info("num_playouts:{}, win: {}, lose: {}, tie:{}".format(
                 self.pure_mcts_playout_num,
                 win_cnt[1], win_cnt[2], win_cnt[-1]))
         return win_ratio
@@ -207,46 +220,46 @@ class TrainPipeline():
             for i in range(self.game_batch_num):
                 current_time = time.time()
                 self.collect_selfplay_data(1, training_index = i)
-                print('collection cost time:  ', time.time() - current_time)
-                print("batch i:{}, episode_len:{}, buffer_len:{}".format(
+                _logger.info('collection cost time: %d ' % (time.time() - current_time))
+                _logger.info("batch i:{}, episode_len:{}, buffer_len:{}".format(
                         i+1, self.episode_len, len(self.data_buffer)))
                 if len(self.data_buffer) > self.batch_size:
                     batch_time = time.time()
                     loss, entropy = self.policy_update()
-                    print('train batch cost time: ', time.time() - batch_time)
+                    _logger.info('train batch cost time: %d' % (time.time() - batch_time))
                 # check the performance of the current model,
                 # and save the model params
                 if (i+1) % 50 == 0:
-                    self.policy_value_net.save_model('./current_policy.model')
+                    self.policy_value_net.save_model('./logs/current_policy.model')
                 if (i+1) % self.check_freq == 0:
-                    print("current self-play batch: {}".format(i+1))
+                    _logger.info("current self-play batch: {}".format(i+1))
                     win_ratio = self.policy_evaluate()
                     if win_ratio > self.best_win_ratio:
-                        print("New best policy!!!!!!!!")
+                        _logger.info("New best policy!!!!!!!!")
                         self.best_win_ratio = win_ratio
                         # update the best_policy
-                        self.policy_value_net.save_model('./best_policy_%s.model' % i)
+                        self.policy_value_net.save_model('./logs/best_policy_%s.model' % i)
                         if (self.best_win_ratio >= 0.98 and
                                 self.pure_mcts_playout_num < 8000):
                             self.pure_mcts_playout_num += 1000
                             self.best_win_ratio = 0.0
         except KeyboardInterrupt:
-            print('\n\rquit')
+            _logger.info('\n\rquit')
 
 
 if __name__ == '__main__':
-    # model_file = 'current_policy.model'
-    model_file = None
+    model_file = './logs/current_policy.model'
+    # model_file = None
     policy_param = None 
+    conf = config_loader.load_config('./conf/train_config.yaml')
     if model_file is not None:
-        print('loading...', model_file)
+        _logger.info('loading...%s' %  model_file)
         try:
             policy_param = pickle.load(open(model_file, 'rb'))
         except:
             policy_param = pickle.load(open(model_file, 'rb'),
                                        encoding='bytes')  # To support python3
-    training_pipeline = TrainPipeline(policy_param)
-    print('enter training!')
-    training_pipeline.collect_selfplay_data(1, 1)
-    exit()
+    training_pipeline = TrainPipeline(conf, policy_param)
+    _logger.info('enter training!')
+    # training_pipeline.collect_selfplay_data(1, 1)
     training_pipeline.run()
