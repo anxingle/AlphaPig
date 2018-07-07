@@ -16,7 +16,7 @@ from collections import defaultdict, deque
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-from utils import *
+from utils import config_loader
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 # from policy_value_net import PolicyValueNet  # Theano and Lasagne
@@ -27,7 +27,7 @@ from policy_value_net_mxnet import PolicyValueNet # Mxnet
 
 import logging
 import logging.config
-logging.config.dictConfig(config_['train_logging'])
+logging.config.dictConfig(config_loader.config_['train_logging'])
 _logger = logging.getLogger(__name__)
 
 current_relative_path = lambda x: os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), x))
