@@ -21,7 +21,7 @@ play_batch_size: 1
 # KL散度
 kl_targ: 0.02
 # 每check_freq次 检测对弈成绩
-check_freq: 500
+check_freq: 1000
 # 检测成绩用的mcts对手的思考深度
 pure_mcts_playout_num: 1000
 # 训练多少轮
