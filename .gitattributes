@@ -1,0 +1,7 @@
+pickle_ai_data/dump55.txt filter=lfs diff=lfs merge=lfs -text
+pickle_ai_data/dump1.txt filter=lfs diff=lfs merge=lfs -text
+pickle_ai_data/dump11.txt filter=lfs diff=lfs merge=lfs -text
+pickle_ai_data/dump2.txt filter=lfs diff=lfs merge=lfs -text
+pickle_ai_data/dump22.txt filter=lfs diff=lfs merge=lfs -text
+pickle_ai_data/dump33.txt filter=lfs diff=lfs merge=lfs -text
+pickle_ai_data/dump44.txt filter=lfs diff=lfs merge=lfs -text
