@@ -274,7 +274,7 @@ class Game(object):
                 end = 1
                 winner = X_train['winner']
                 try:
-                    # 这是一个故意的“bug”，目的在于检验是否end
+                    # 这是一个故意的“bug”，目的在于检验是否end。不用也行。
                     _logger.error('file_name %s has some problem! seq_num_list: %s' % (file_name, X_train['seq_num_list'][num_index+1]))
                 except Exception as e:
                     # 倘若进入了这个“bug”, 则不用报告warning
