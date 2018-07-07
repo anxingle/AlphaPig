@@ -8,7 +8,7 @@ Tested under Keras 2.0.5 with tensorflow-gpu 1.2.1 as backend
 from __future__ import print_function
 import sys
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6,7"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 # sys.path.insert(0, '/home/mingzhang/work/dmlc/python_mxnet/python')
 
 import mxnet as mx
@@ -19,7 +19,7 @@ import pickle
 class PolicyValueNet():
     """policy-value network """
     def __init__(self, board_width, board_height, batch_size=512, model_params=None):
-        self.context = mx.cpu()
+        self.context = mx.gpu(1)
         self.batchsize = batch_size  #must same to the TrainPipeline's self.batch_size.
         self.channelnum = 9
         self.board_width = board_width
@@ -163,12 +163,11 @@ class PolicyValueNet():
         input_states = mx.sym.Variable(name='input_states', shape=input_states_shape)
         action_1, evaluation = self.create_backbone(input_states)
         policy_value_output = mx.sym.Group([action_1, evaluation])
-        
-        contexts = self.context if batch_size > 2 else mx.cpu() 
+
         pv_predict = mx.mod.Module(symbol=policy_value_output, 
                                    data_names=['input_states'],
                                    label_names=None,
-                                   context=contexts) 
+                                   context=self.context) 
         
         pv_predict.bind(data_shapes=[('input_states', input_states_shape)], for_training=False)
         args, auxs = self.train_batch.get_params()
