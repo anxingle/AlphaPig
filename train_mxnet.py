@@ -232,8 +232,10 @@ class TrainPipeline():
                 if (i+1) % 50 == 0:
                     self.policy_value_net.save_model('./logs/current_policy.model')
                 if (i+1) % self.check_freq == 0:
+                    check_time = time.time()
                     _logger.info("current self-play batch: {}".format(i+1))
                     win_ratio = self.policy_evaluate()
+                    _logger.info('evaluate the network cost time: %s ', int(time.time() - check_time))
                     if win_ratio > self.best_win_ratio:
                         _logger.info("New best policy!!!!!!!!")
                         self.best_win_ratio = win_ratio
