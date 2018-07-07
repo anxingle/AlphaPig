@@ -8,7 +8,13 @@ import numpy as np
 import os
 from policy_value_net_mxnet import PolicyValueNet # Keras
 from mcts_alphaZero import MCTSPlayer
-from utils import sgf_dataIter
+from utils import sgf_dataIter, config_loader
+
+
+import logging
+import logging.config
+logging.config.dictConfig(config_loader.config_['train_logging'])
+_logger = logging.getLogger(__name__)
 
 current_relative_path = lambda x: os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), x))
 
@@ -169,6 +175,7 @@ class Game(object):
 
     def __init__(self, board, **kwargs):
         self.board = board
+        self._boardSize = board.width * board.height
 
     def graphic(self, board, player1, player2):
         """Draw the board and show game info"""
@@ -232,19 +239,22 @@ class Game(object):
         data_length = len(X_train['seq_num_list'])   # 对弈长度（一盘棋盘数据的长度）
         self.board.init_board()
         p1, p2 = self.board.players
-        print('p1: ', p1, '   p2:  ', p2)
+        # print('p1: ', p1, '   p2:  ', p2)
         states, mcts_probs, current_players = [], [], []
         # while True:
         for num_index, move in enumerate(X_train['seq_num_list']):
-            move_, move_probs = player.get_action(self.board,
-                                                 temp=temp,
-                                                 return_prob=1)
-            print('move:   ')
-            print(move)
-            print('move probs: ')
+            # move_, move_probs = player.get_action(self.board,
+            #                                      temp=temp,
+            #                                      return_prob=1)
+            probs = [0.000001 for _ in range(self._boardSize)]
+            probs[move] = 0.99999
+            move_probs = np.asarray(probs)
+            # print('move:   ')
+            # print(move)
+            # print('move probs: ')
             # print(move_probs)
-            print(type(move_probs))
-            print(move_probs.shape)
+            # print(type(move_probs))
+            # print(move_probs.shape)
             # store the data
             # print('current_state: \n')
             # print(self.board.current_state())
@@ -265,7 +275,7 @@ class Game(object):
                 winner = X_train['winner']
                 try:
                     # 这是一个故意的“bug”，目的在于检验是否end
-                    print('seq_num_list ...', X_train['seq_num_list'][num_index+1])
+                    _logger.error('file_name %s has some problem! seq_num_list: %s' % (file_name, X_train['seq_num_list'][num_index+1]))
                 except Exception as e:
                     # 倘若进入了这个“bug”, 则不用报告warning
                     warning = 0
@@ -286,8 +296,6 @@ class Game(object):
                         print("Game end. Tie")
                 # go_on = input('go on:')
                 # winner 1:2
-                print('winner: ', winner)
-                print(X_train['file_name'])
                 return warning, winner, zip(states, mcts_probs, winners_z)
 
 
