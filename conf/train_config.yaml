@@ -14,7 +14,7 @@ n_playout: 200
 # TODO: 蒙特卡洛树模拟选择时更多的依靠先验，C_put影响选择的程度？
 c_puct: 5
 # 数据集最大量（双端队列长度）
-buffer_size: 1228800
+buffer_size: 2228800
 batch_size: 512
 epochs: 8
 play_batch_size: 1
