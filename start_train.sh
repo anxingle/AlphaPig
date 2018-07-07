@@ -1,1 +1,1 @@
-nohup python -u train_mxnet.py
+nohup python -u train_mxnet.py &
