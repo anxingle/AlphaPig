@@ -2,10 +2,10 @@
 import os
 import sys
 import time
-# 可视化棋谱
-from gobang_board_utils import chessboard, evaluation, searcher, psyco_speedup
+# 可视化棋谱 视情况决定是否引入
+# from gobang_board_utils import chessboard, evaluation, searcher, psyco_speedup
 # 加速函数 
-psyco_speedup()
+# psyco_speedup()
 
 LETTER_NUM = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']
 BIG_LETTER_NUM = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
@@ -94,7 +94,7 @@ def read_files(data_dir):
         yield {'winner': winner, 'seq_list': seq_list, 'seq_num_list': seq_num_list, 'index': index, 'file_name':file_list[index]}
         index += 1
 
-
+# 仅用于走子可视化
 def gamemain(seq_list):
     b = chessboard()
     s = searcher()

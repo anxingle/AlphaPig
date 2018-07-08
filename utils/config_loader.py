@@ -13,4 +13,6 @@ def load_config(data_path):
     f.close()
     return conf
 
-config_ = load_config('./conf/train_config.yaml')
+configure_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../conf/train_config.yaml')
+config_ = load_config(configure_path)
+
