@@ -132,11 +132,12 @@ class TrainPipeline():
         _logger.info('game_batch_index: %s, length of data_buffer: %s' % (training_index, len(self.data_buffer)))
         #print(len(self.data_buffer), n_games)
 
-    def collect_selfplay_data_ai(self, n_games=1):
+    def collect_selfplay_data_ai(self, n_games=1, training_index=None):
         """collect AI self-play data for training"""
         for i in range(n_games):
             winner, play_data = self.game_ai.start_self_play(self.mcts_player,
                                                           temp=self.temp)
+            _logger.info('traing_index: %s,   winner is: %s' % (training_index, winner))
             play_data = list(play_data)[:]
             self.episode_len = len(play_data)
             # augment the data
@@ -235,12 +236,12 @@ class TrainPipeline():
         try:
             for i in range(self.game_batch_num):
                 current_time = time.time()
-                if i < 8000:
+                if i < 1000:
                     self.collect_selfplay_data(1, training_index=i)
                 else:
-                    self.collect_selfplay_data_ai(1)
-                if i % 5 == 0 and i >= 8000:
-                    self.collect_selfplay_data(1, training_index=i)
+                    self.collect_selfplay_data_ai(1, training_index=i)
+                if i % 5 == 0 and i >= 1000:
+                    self.collect_selfplay_data(1, training_index=i+random.randint(1, 1000))
                 _logger.info('collection cost time: %d ' % (time.time() - current_time))
                 _logger.info("batch i:{}, episode_len:{}, buffer_len:{}".format(
                         i+1, self.episode_len, len(self.data_buffer)))

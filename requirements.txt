@@ -2,5 +2,5 @@ line_profiler==2.1.2
 requests==2.18.4
 numpy==1.14.2
 beautifulsoup4==4.6.0
-psyco==1.6
 PyYAML==3.13
+psyco
