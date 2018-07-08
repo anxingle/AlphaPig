@@ -3,6 +3,7 @@
 An implementation of the training pipeline of AlphaZero for Gomoku
 
 @author: Junxiao Song
+         anxingle
 """
 
 from __future__ import print_function
@@ -14,6 +15,7 @@ import numpy as np
 import multiprocessing as mp
 from collections import defaultdict, deque
 from game import Board, Game
+from game_ai import Game_AI
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
 from utils import config_loader
@@ -43,6 +45,7 @@ class TrainPipeline():
                            height=self.board_height,
                            n_in_row=self.n_in_row)
         self.game = Game(self.board)
+        self.game_ai = Game_AI(self.board)
         # training params
         self.learn_rate = conf['learn_rate']
         self.lr_multiplier = conf['lr_multiplier']  # adaptively adjust the learning rate based on KL
@@ -112,7 +115,7 @@ class TrainPipeline():
         return extend_data
 
     def collect_selfplay_data(self, n_games=1, training_index=None):
-        """collect self-play data for training"""
+        """collect SGF file data for training"""
         data_index = training_index % self._length_train_data
         for i in range(n_games):
             warning, winner, play_data = self.game.start_self_play(self.mcts_player, temp=self.temp, sgf_home=self._sgf_home, file_name=self._training_data[data_index])
@@ -127,6 +130,18 @@ class TrainPipeline():
                 play_data = self.get_equi_data(play_data)
                 self.data_buffer.extend(play_data)
         _logger.info('game_batch_index: %s, length of data_buffer: %s' % (training_index, len(self.data_buffer)))
+        #print(len(self.data_buffer), n_games)
+
+    def collect_selfplay_data_ai(self, n_games=1):
+        """collect AI self-play data for training"""
+        for i in range(n_games):
+            winner, play_data = self.game_ai.start_self_play(self.mcts_player,
+                                                          temp=self.temp)
+            play_data = list(play_data)[:]
+            self.episode_len = len(play_data)
+            # augment the data
+            play_data = self.get_equi_data(play_data)
+            self.data_buffer.extend(play_data)
         #print(len(self.data_buffer), n_games)
 
     # def _multiprocess_collect_selfplay_data(self, q, process_index):
@@ -220,7 +235,12 @@ class TrainPipeline():
         try:
             for i in range(self.game_batch_num):
                 current_time = time.time()
-                self.collect_selfplay_data(1, training_index=i)
+                if i < 8000:
+                    self.collect_selfplay_data(1, training_index=i)
+                else:
+                    self.collect_selfplay_data_ai(1)
+                if i % 5 == 0 and i >= 8000:
+                    self.collect_selfplay_data(1, training_index=i)
                 _logger.info('collection cost time: %d ' % (time.time() - current_time))
                 _logger.info("batch i:{}, episode_len:{}, buffer_len:{}".format(
                         i+1, self.episode_len, len(self.data_buffer)))
