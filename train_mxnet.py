@@ -18,7 +18,7 @@ from game import Board, Game
 from game_ai import Game_AI
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-from utils import config_loader
+from utils import config_loader, send_email
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 # from policy_value_net import PolicyValueNet  # Theano and Lasagne
@@ -271,18 +271,24 @@ class TrainPipeline():
 
 
 if __name__ == '__main__':
-    model_file = './logs/current_policy.model'
-    # model_file = None
-    policy_param = None 
-    conf = config_loader.load_config('./conf/train_config.yaml')
-    if model_file is not None:
-        _logger.info('loading...%s' %  model_file)
-        try:
-            policy_param = pickle.load(open(model_file, 'rb'))
-        except:
-            policy_param = pickle.load(open(model_file, 'rb'),
-                                       encoding='bytes')  # To support python3
-    training_pipeline = TrainPipeline(conf, policy_param)
-    _logger.info('enter training!')
-    # training_pipeline.collect_selfplay_data(1, 1)
-    training_pipeline.run()
+    try:
+        start_time = time.time()
+        model_file = './logs/current_policy.model'
+        # model_file = None
+        policy_param = None 
+        conf = config_loader.load_config('./conf/train_config.yaml')
+        if model_file is not None:
+            _logger.info('loading...%s' %  model_file)
+            try:
+                policy_param = pickle.load(open(model_file, 'rb'))
+            except:
+                policy_param = pickle.load(open(model_file, 'rb'),
+                                           encoding='bytes')  # To support python3
+        training_pipeline = TrainPipeline(conf, policy_param)
+        _logger.info('enter training!')
+        # training_pipeline.collect_selfplay_data(1, 1)
+        training_pipeline.run()
+    except Exception as e:
+        cost_time = int(time.time() - start_time)
+        format_time = "耗时： %s 小时 %s 分 %s 秒" % (cost_time/3600, (cost_time%3600)/60, (cost_time%3600)%60 )
+        send_email.send_mail('训练结束', format_time)
