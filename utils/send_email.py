@@ -5,9 +5,10 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 
 
-def send_mail(message_title, message_text):
+def send_mail(message_title, message_text, pass_wd):
     my_sender='987683297@qq.com'    # 发件人邮箱账号
-    my_pass = 'XXXXXX'    # 发件人邮箱密码
+    my_pass = 'oktbbgwyddpybeih'    # 发件人邮箱密码
+    my_pass = pass_wd
     my_user='anxingle820@gmail.com'      # 收件人邮箱账号，我这边发送给自己
     ret=True
     try:
