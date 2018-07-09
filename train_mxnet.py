@@ -12,6 +12,7 @@ import random
 import os
 import time
 import numpy as np
+from optparse import OptionParser
 import multiprocessing as mp
 from collections import defaultdict, deque
 from game import Board, Game
@@ -272,6 +273,12 @@ class TrainPipeline():
 
 
 if __name__ == '__main__':
+    # 解析命令行参数
+    parser = OptionParser()
+    parser.add_option('-p', '--pass',
+                      action='store', dest='PassWd', type='str', default='XXX',
+                      help='specipy a QQ email passwd')
+    (options, args) = parser.parse_args()
     try:
         start_time = time.time()
         model_file = './logs/current_policy.model'
@@ -292,4 +299,4 @@ if __name__ == '__main__':
     except Exception as e:
         cost_time = int(time.time() - start_time)
         format_time = "耗时： %s 小时 %s 分 %s 秒" % (cost_time/3600, (cost_time%3600)/60, (cost_time%3600)%60 )
-        send_email.send_mail('训练结束', format_time)
+        send_email.send_mail('训练结束', format_time, options.PassWd)
