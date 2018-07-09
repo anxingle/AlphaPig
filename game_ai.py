@@ -6,12 +6,14 @@
 from __future__ import print_function
 import numpy as np
 from game import Board
+import random
 
 class Game_AI(object):
     """game server"""
 
     def __init__(self, board, **kwargs):
         self.board = board
+        self._boardSize = board.width * board.height
 
     def graphic(self, board, player1, player2):
         """Draw the board and show game info"""
@@ -72,6 +74,42 @@ class Game_AI(object):
         self.board.init_board()
         p1, p2 = self.board.players
         states, mcts_probs, current_players = [], [], []
+        blank_move_list = [0,1,2,3,4,5,6,7,8,15,16,17,18,19,20,21,22,23,30,31,32,33,34,35,36,37,38,45,46,47,48,49,50,51,52,53,60,61,62,63,64,65,66,67,68,75,76,77,78,79,80,81,82,83,90,91,92,93,94,95,96,97,98]
+        white_move_list = range(0, 103)
+        if random.random() < 0.15:
+            while True:
+                move_blank = random.choice(blank_move_list)
+                # move_blank = blank_move_list[random.randint(0, len()-1)]
+                move_white = random.choice(white_move_list)
+                if move_blank != move_white:
+                    break
+            # store the data
+            # 黑子走子概率
+            probs = [0.000001 for _ in range(self._boardSize)]
+            probs[move_blank] = 0.99999
+            move_blank_probs = np.asarray(probs)
+
+            states.append(self.board.current_state())
+            mcts_probs.append(move_blank_probs)
+            current_players.append(self.board.current_player)
+            # perform a move
+            self.board.do_move(move_blank)
+            if is_shown:
+                self.graphic(self.board, p1, p2)
+
+            # 白子走子概率
+            probs_ = [0.000001 for _ in range(self._boardSize)]
+            probs_[move_white] = 0.99999
+            move_white_probs = np.asarray(probs_)
+
+            states.append(self.board.current_state())
+            mcts_probs.append(move_white_probs)
+            current_players.append(self.board.current_player)
+            # perform a move
+            self.board.do_move(move_white)
+            if is_shown:
+                self.graphic(self.board, p1, p2)
+
         while True:
             move, move_probs = player.get_action(self.board,
                                                  temp=temp,
