@@ -72,6 +72,8 @@ class TreeNode(object):
         adjusted for its visit count, u.
         c_puct: a number in (0, inf) controlling the relative impact of
             value Q, and prior probability P, on this node's score.
+        参考Upper Confidence Bounds (UCB)选择公式：
+        Latex: $score=x_{child}+C*\sqrt{\frac{logN_{parent}}{N_{child}}}$
         """
         self._u = (c_puct * self._P *
                    np.sqrt(self._parent._n_visits) / (1 + self._n_visits))
