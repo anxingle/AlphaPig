@@ -18,8 +18,8 @@ import pickle
 
 class PolicyValueNet():
     """policy-value network """
-    def __init__(self, board_width, board_height, batch_size=512, model_params=None):
-        self.context = mx.gpu(1)
+    def __init__(self, board_width, board_height, batch_size=512, n_blocks=8, n_filter=128, model_params=None):
+        self.context = mx.gpu(0)
         self.batchsize = batch_size  #must same to the TrainPipeline's self.batch_size.
         self.channelnum = 9
         self.board_width = board_width
@@ -28,6 +28,8 @@ class PolicyValueNet():
         self.train_batch = self.create_policy_value_train(self.batchsize)   
         self.predict_batch = self.create_policy_value_predict(self.batchsize)   
         self.predict_one = self.create_policy_value_predict(1)   
+        self._n_blocks = n_blocks
+        self._n_filter = n_filter
         self.num = 0
 
         if model_params:
@@ -65,8 +67,45 @@ class PolicyValueNet():
 
         return fc_1
 
+    def create_backbone_resnet(self, input_states):
+        """ 8层残差网络 """
+
+        con_net = self.conv_act(input_states, 128, (3, 3), name='res_conv1')
+        for i in range(1, self._n_blocks+1):
+            # 残差结构定义
+            pre_identity = con_net # 保存残差之前部分
+            con_net = mx.sym.Convolution(con_net, name='convA'+str(i), kernel=(3, 3), pad=(1, 1), num_filter = self._n_filter)
+            con_net = mx.sym.BatchNorm(con_net, name='bnA'+str(i), fix_gamma=False)
+            con_net = mx.sym.Activation(con_net, name='actA'+str(i), act_type='relu')
+            # 最后一层是256个卷积核
+            _num_filter = self._n_filter * 2 if i == self._n_blocks else self._n_filter
+            con_net = mx.sym.Convolution(con_net, name='convB'+str(i), kernel=(3, 3), pad=(1, 1), num_filter = _num_filter)
+            con_net = mx.sym.BatchNorm(con_net, name='bnB'+str(i), fix_gamma=False)
+            con_net = con_net + pre_identity # 加上之前的输出，即为残差结构
+            con_net = mx.sym.Activation(con_net, name='actB'+str(i), act_type='relu')
+
+        # action output
+        conv3_act = self.conv_act(con_net, 4, (1, 1), name='conv3_1_1')
+        flatten_1 = mx.sym.Flatten(conv3_act)
+        flatten_1 = mx.sym.Dropout(flatten_1, p=0.5)
+        fc_3_1_1 = self.fc_self(flatten_1, self.board_height*self.board_width, name='fc_3_1_1')
+        action_1 = mx.sym.SoftmaxActivation(fc_3_1_1, name='Act_SILER')
+
+        # value output
+        conv3_2_1 = self.conv_act(con_net, 2, (1, 1), name='conv3_2_1')
+        flatten_2 = mx.sym.Flatten(conv3_2_1)
+        flatten_2 = mx.sym.Dropout(flatten_2, p=0.5)
+        fc_3_2_1 = self.fc_self(flatten_2, 1, name='fc_3_2_1')
+        evaluation = mx.sym.Activation(fc_3_2_1, act_type='tanh')
+
+        # mx.viz.plot_network(action_1).view()
+        # mx.viz.plot_network(evaluation).view()
+
+        return action_1, evaluation
+
+
     def create_backbone(self, input_states):
-        """create the policy value network """   
+        """ 原始策略价值网络 """   
        
         conv1 = self.conv_act(input_states, 64, (3, 3), name='conv1')
         conv2 = self.conv_act(conv1, 64, (3, 3), name='conv2')
@@ -80,7 +119,14 @@ class PolicyValueNet():
         flatten_1 = mx.sym.Flatten(conv3_1_1)       
         flatten_1 = mx.sym.Dropout(flatten_1, p=0.5)
         fc_3_1_1 = self.fc_self(flatten_1, self.board_height*self.board_width, name='fc_3_1_1')
-        action_1 = mx.sym.SoftmaxActivation(fc_3_1_1) 
+        action_1 = mx.sym.SoftmaxActivation(fc_3_1_1, name='Act_SILER')
+        # arg_shapes, out_shapes, aux_shapes = action_1.infer_shape()
+        # print('arg_shape:  ', arg_shapes)
+        # print('out_shape:  ', out_shapes)
+        # print('aux_shape:  ', aux_shapes)
+        # arg_shape:  [(512L, 9L, 15L, 15L), (64L, 9L, 3L, 3L), (64L,), (64L,), (64L,), (64L, 64L, 3L, 3L), (64L,), (64L,), (64L,), (128L, 64L, 3L, 3L), (128L,), (128L,), (128L,), (128L, 128L, 3L, 3L), (128L,), (128L,), (128L,), (256L, 128L, 3L, 3L), (256L,), (256L,), (256L,), (256L, 256L, 3L, 3L), (256L,), (256L,), (256L,), (4L, 256L, 1L, 1L), (4L,), (4L,), (4L,), (225L, 900L), (225L,)]
+        # out_shape:  [(512L, 225L)]
+        # aux_shape:  [(64L,), (64L,), (64L,), (64L,), (128L,), (128L,), (128L,), (128L,), (256L,), (256L,), (256L,), (256L,), (4L,), (4L,)]
 
         # state value layers
         conv3_2_1 = self.conv_act(final, 2, (1, 1), name='conv3_2_1')
@@ -88,6 +134,14 @@ class PolicyValueNet():
         flatten_2 = mx.sym.Dropout(flatten_2, p=0.5)
         fc_3_2_1 = self.fc_self(flatten_2, 1, name='fc_3_2_1')
         evaluation = mx.sym.Activation(fc_3_2_1, act_type='tanh')
+        # args_shapes, out_shapes, aux_shapes = evaluation.infer_shape()
+        # args_shape: [(5L, 9L, 15L, 15L), (64L, 9L, 3L, 3L), (64L,), (64L,), (64L,), (64L, 64L, 3L, 3L), (64L,), (64L,), (64L,), (128L, 64L, 3L, 3L), (128L,), (128L,), (128L,), (128L, 128L, 3L, 3L), (128L,), (128L,), (128L,), (256L, 128L, 3L, 3L), (256L,), (256L,), (256L,), (256L, 256L, 3L, 3L), (256L,), (256L,), (256L,), (2L, 256L, 1L, 1L), (2L,), (2L,), (2L,), (1L, 450L), (1L,)]
+        # out_shapes: [(5L, 1L)]
+        # aux_shapes: [(64L,), (64L,), (64L,), (64L,), (128L,), (128L,), (128L,), (128L,), (256L,), (256L,), (256L,), (256L,), (2L,), (2L,)]
+        mx.viz.plot_network(action_1).view()
+        # mx.viz.plot_network(evaluation).view()
+        go_on = input("go on?:")
+        if go_on == 0: exit()
 
         return action_1, evaluation
 
@@ -121,7 +175,8 @@ class PolicyValueNet():
     def create_policy_value_train(self, batch_size):
         input_states_shape = (batch_size, self.channelnum, self.board_height, self.board_width)
         input_states = mx.sym.Variable(name='input_states', shape=input_states_shape)
-        action_1, evaluation = self.create_backbone(input_states)
+        # action_1, evaluation = self.create_backbone(input_states)
+        action_1, evaluation = self.create_backbone_resnet(input_states)
  
         mcts_probs_shape = (batch_size, self.board_height * self.board_width)
         mcts_probs = mx.sym.Variable(name='mcts_probs', shape=mcts_probs_shape)
@@ -161,7 +216,8 @@ class PolicyValueNet():
     def create_policy_value_predict(self, batch_size): 
         input_states_shape = (batch_size, self.channelnum, self.board_height, self.board_width)
         input_states = mx.sym.Variable(name='input_states', shape=input_states_shape)
-        action_1, evaluation = self.create_backbone(input_states)
+        # action_1, evaluation = self.create_backbone(input_states)
+        action_1, evaluation = self.create_backbone_resnet(input_states)
         policy_value_output = mx.sym.Group([action_1, evaluation])
 
         pv_predict = mx.mod.Module(symbol=policy_value_output, 
@@ -226,6 +282,7 @@ class PolicyValueNet():
         return act_probs, values[0]
 
     def train_step(self, state_batch, mcts_probs, winner_batch, learning_rate):
+        # winner_batch: 1.0/-1.0
         #print('hello training....')
         #print(mcts_probs[0], winner_batch[0])
         self.train_batch._optimizer.lr = learning_rate
