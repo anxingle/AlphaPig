@@ -35,7 +35,6 @@ _logger = logging.getLogger(__name__)
 
 current_relative_path = lambda x: os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), x))
 
-
 class TrainPipeline():
     def __init__(self, conf, init_model=None):
         # params of the board and the game
@@ -70,18 +69,26 @@ class TrainPipeline():
         # 训练集文件
         self._sgf_home = current_relative_path(conf['sgf_dir'])
         _logger.info('path: %s' % self._sgf_home)
+        self._ai_data_home = current_relative_path(conf['ai_data_dir'])
+        # 加载人类对弈数据
         self._load_training_data(self._sgf_home)
+        # 加载保存的自对弈数据
+        self._load_pickle_data(self._ai_data_home)
         if init_model:
             # start training from an initial policy-value net
             self.policy_value_net = PolicyValueNet(self.board_width,
                                                    self.board_height,
                                                    self.batch_size,
+                                                   n_blocks=10,
+                                                   n_filter=128,
                                                    model_params=init_model)
         else:
             # start training from a new policy-value net
             self.policy_value_net = PolicyValueNet(self.board_width,
                                                    self.board_height,
-                                                   self.batch_size)
+                                                   self.batch_size,
+                                                   n_blocks=10,
+                                                   n_filter=128)
         self.mcts_player = MCTSPlayer(self.policy_value_net.policy_value_fn,
                                       c_puct=self.c_puct,
                                       n_playout=self.n_playout,
@@ -92,6 +99,16 @@ class TrainPipeline():
         self._training_data = [item for item in file_list if item.endswith('.sgf') and os.path.isfile(os.path.join(data_dir, item))]
         random.shuffle(self._training_data)
         self._length_train_data = len(self._training_data)
+
+    def _load_pickle_data(self, data_dir):
+        file_list = os.listdir(data_dir)
+        txt_list = [item for item in file_list if item.endswith('.txt') and os.path.isfile(os.path.join(data_dir, item))]
+        self._ai_history_data = []
+        for txt_f in txt_list:
+            f_object = open(os.path.join(data_dir, txt_f), 'rb')
+            d = pickle.load(f_object)
+            self._ai_history_data += d
+            f_object.close()
 
     def get_equi_data(self, play_data):
         """augment the data set by rotation and flipping
@@ -118,6 +135,8 @@ class TrainPipeline():
     def collect_selfplay_data(self, n_games=1, training_index=None):
         """collect SGF file data for training"""
         data_index = training_index % self._length_train_data
+        if data_index == 0:
+            random.shuffle(self._training_data)
         for i in range(n_games):
             warning, winner, play_data = self.game.start_self_play(self.mcts_player, temp=self.temp, sgf_home=self._sgf_home, file_name=self._training_data[data_index])
             if warning:
@@ -131,7 +150,18 @@ class TrainPipeline():
                 play_data = self.get_equi_data(play_data)
                 self.data_buffer.extend(play_data)
         _logger.info('game_batch_index: %s, length of data_buffer: %s' % (training_index, len(self.data_buffer)))
-        #print(len(self.data_buffer), n_games)
+
+    def collect_selfplay_data_pickle(self, n_games=1, training_index=None):
+        """ 使用pickle保存的曾经的对弈数据 """
+        data_index = training_index % len(self._ai_history_data)
+        if data_index == 0:
+            random.shuffle(self._ai_history_data)
+        for i in range(n_games):
+            play_data = self._ai_history_data[data_index]
+            self.episode_len = len(play_data)
+            # augment the data
+            play_data = self.get_equi_data(play_data)
+            self.data_buffer.extend(play_data)
 
     def collect_selfplay_data_ai(self, n_games=1, training_index=None):
         """collect AI self-play data for training"""
@@ -237,12 +267,19 @@ class TrainPipeline():
         try:
             for i in range(self.game_batch_num):
                 current_time = time.time()
-                if i < 1000:
+                if i < 2000:
+                    self.collect_selfplay_data_pickle(1, training_index=i)
+                elif i < 7000:
                     self.collect_selfplay_data(1, training_index=i)
+                elif i < 12000:
+                    if i%8 == 0 or i%8 == 4:
+                        self.collect_selfplay_data_pickle(1, training_index=i)
+                    elif i % 8 == 3:
+                        self.collect_selfplay_data(1, training_index=i)
+                    else:
+                        self.collect_selfplay_data_ai(1, training_index=i)
                 else:
                     self.collect_selfplay_data_ai(1, training_index=i)
-                if i % 5 == 0 and i >= 1000:
-                    self.collect_selfplay_data(1, training_index=i+random.randint(1, 1000))
                 _logger.info('collection cost time: %d ' % (time.time() - current_time))
                 _logger.info("batch i:{}, episode_len:{}, buffer_len:{}".format(
                         i+1, self.episode_len, len(self.data_buffer)))
@@ -273,12 +310,6 @@ class TrainPipeline():
 
 
 if __name__ == '__main__':
-    # 解析命令行参数
-    parser = OptionParser()
-    parser.add_option('-p', '--pass',
-                      action='store', dest='PassWd', type='str', default='XXX',
-                      help='specipy a QQ email passwd')
-    (options, args) = parser.parse_args()
     try:
         start_time = time.time()
         model_file = './logs/current_policy.model'
@@ -297,6 +328,8 @@ if __name__ == '__main__':
         # training_pipeline.collect_selfplay_data(1, 1)
         training_pipeline.run()
     except Exception as e:
+        _logger.exception(e)
+    finally:
         cost_time = int(time.time() - start_time)
         format_time = "耗时： %s 小时 %s 分 %s 秒" % (cost_time/3600, (cost_time%3600)/60, (cost_time%3600)%60 )
-        send_email.send_mail('训练结束', format_time, options.PassWd)
+        send_email.send_mail('训练结束', format_time, 'XXX')

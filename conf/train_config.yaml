@@ -1,5 +1,7 @@
 # 数据目录
 sgf_dir: './sgf_data'
+# AI对弈数据目录
+ai_data_dir: './pickle_ai_data'
 # 棋盘设置
 board_width: 15
 board_height: 15
@@ -10,22 +12,22 @@ learn_rate: 0.0004
 lr_multiplier: 1.0
 temp: 1.0
 # 每次移动的simulations数
-n_playout: 1000
+n_playout: 400
 # TODO: 蒙特卡洛树模拟选择时更多的依靠先验，估值越精确，C就应该偏向深度（越小）
 c_puct: 5
 # 数据集最大量（双端队列长度）
-buffer_size: 1898800
+buffer_size: 2198800
 batch_size: 512
 epochs: 8
 play_batch_size: 1
 # KL散度
 kl_targ: 0.02
 # 每check_freq次 检测对弈成绩
-check_freq: 2000
+check_freq: 10000
 # 检测成绩用的mcts对手的思考深度
 pure_mcts_playout_num: 1000
 # 训练多少轮
-game_batch_num: 14000
+game_batch_num: 24000
 
 
 # 训练日志
