@@ -8,7 +8,7 @@ Tested under Keras 2.0.5 with tensorflow-gpu 1.2.1 as backend
 from __future__ import print_function
 import sys
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6,7"
 # sys.path.insert(0, '/home/mingzhang/work/dmlc/python_mxnet/python')
 
 import mxnet as mx
@@ -24,12 +24,12 @@ class PolicyValueNet():
         self.channelnum = 9
         self.board_width = board_width
         self.board_height = board_height 
+        self._n_blocks = n_blocks
+        self._n_filter = n_filter
         self.l2_const = 1e-4  # coef of l2 penalty 
         self.train_batch = self.create_policy_value_train(self.batchsize)   
         self.predict_batch = self.create_policy_value_predict(self.batchsize)   
         self.predict_one = self.create_policy_value_predict(1)   
-        self._n_blocks = n_blocks
-        self._n_filter = n_filter
         self.num = 0
 
         if model_params:
@@ -74,12 +74,10 @@ class PolicyValueNet():
         for i in range(1, self._n_blocks+1):
             # 残差结构定义
             pre_identity = con_net # 保存残差之前部分
-            con_net = mx.sym.Convolution(con_net, name='convA'+str(i), kernel=(3, 3), pad=(1, 1), num_filter = self._n_filter)
+            con_net = mx.sym.Convolution(con_net, name='convA'+str(i), kernel=(3, 3), pad=(1, 1), num_filter=self._n_filter)
             con_net = mx.sym.BatchNorm(con_net, name='bnA'+str(i), fix_gamma=False)
             con_net = mx.sym.Activation(con_net, name='actA'+str(i), act_type='relu')
-            # 最后一层是256个卷积核
-            _num_filter = self._n_filter * 2 if i == self._n_blocks else self._n_filter
-            con_net = mx.sym.Convolution(con_net, name='convB'+str(i), kernel=(3, 3), pad=(1, 1), num_filter = _num_filter)
+            con_net = mx.sym.Convolution(con_net, name='convB'+str(i), kernel=(3, 3), pad=(1, 1), num_filter=self._n_filter)
             con_net = mx.sym.BatchNorm(con_net, name='bnB'+str(i), fix_gamma=False)
             con_net = con_net + pre_identity # 加上之前的输出，即为残差结构
             con_net = mx.sym.Activation(con_net, name='actB'+str(i), act_type='relu')

@@ -312,8 +312,8 @@ class TrainPipeline():
 if __name__ == '__main__':
     try:
         start_time = time.time()
-        model_file = './logs/current_policy.model'
-        # model_file = None
+        # model_file = './logs/current_policy.model'
+        model_file = None
         policy_param = None 
         conf = config_loader.load_config('./conf/train_config.yaml')
         if model_file is not None:
