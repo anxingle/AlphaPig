@@ -194,6 +194,7 @@ class MCTSPlayer(object):
             if self._is_selfplay:
                 # add Dirichlet Noise for exploration (needed for
                 # self-play training)
+                # dirichlet_noise = K * 1.0/num_move_probs 尝试将0.3设置为0.2甚至更小
                 move = np.random.choice(
                     acts,
                     p=0.75*probs + 0.25*np.random.dirichlet(0.3*np.ones(len(probs)))
