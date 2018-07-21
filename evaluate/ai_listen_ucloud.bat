@@ -1,0 +1,1 @@
+c:\Python27\python.exe AICollection.py --server_url http://120.132.59.147:11111

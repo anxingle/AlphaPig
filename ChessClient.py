@@ -15,7 +15,8 @@ import os
 # 方便引入 AlphaPig
 abs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../')
 sys.path.insert(0, abs_path)
-import AlphaPig as gomoku_zm
+# import AlphaPig as gomoku_zm
+import glory as gomoku_zm
 
 
 class ChessClient():
@@ -159,12 +160,11 @@ class GameStrategy_MZhang():
     def __init__(self, startplayer=0, complex_='s'):
         abs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
         # 普通卷积
-        model_file2 = os.path.join(abs_path, './logs/current_policy_tf_small.model')
         model_file1 = os.path.join(abs_path, './logs/best_policy_tf_10999.model')
+        model_file2 = os.path.join(abs_path, './logs/current_policy_1024.model')
         model_file3 = os.path.join(abs_path, './logs/current_policy_1024.model')
         # 残差5层
         model_file_res = os.path.join(abs_path, './logs/current_res_5.model')
-        model_file_res10 = os.path.join(abs_path, './logs/current_res_10.model')
         policy_param = None
         self.height = 15
         self.width = 15
@@ -174,31 +174,23 @@ class GameStrategy_MZhang():
                 policy_param = pickle.load(open(model_file1, 'rb'))
             except:
                 policy_param = pickle.load(open(model_file1, 'rb'), encoding='bytes')
+        if model_file_res is not None:
+            try:
+                policy_param_res = pickle.load(open(model_file_res, 'rb'))
+            except:
+                policy_param_res = pickle.load(open(model_file_res, 'rb'), encoding='bytes')
 
+        policy_value_net = gomoku_zm.policy_value_net_mxnet_simple.PolicyValueNet(self.height, self.width, batch_size=16, model_params=policy_param)
+        # 残差网络
+        policy_value_net_res = gomoku_zm.policy_value_net_mxnet_res.PolicyValueNet(self.height, self.width, batch_size=16, n_blocks=5, n_filter=128, model_params=policy_param_res)
         if complex_ == 's':
-            policy_value_net = gomoku_zm.policy_value_net_mxnet_simple.PolicyValueNet(self.height, self.width, batch_size=16, model_params=policy_param)
-            self.mcts_player = gomoku_zm.mcts_alphaZero.MCTSPlayer(policy_value_net.policy_value_fn, c_puct=3, n_playout=160)
-            # 500:50s  200:32s
-        # 残差网络 5层
+            self.mcts_player = gomoku_zm.mcts_alphaZero.MCTSPlayer(policy_value_net.policy_value_fn, c_puct=2, n_playout=300)
         elif complex_ == 'r':
-            if model_file_res is not None:
-                try:
-                    policy_param_res = pickle.load(open(model_file_res, 'rb'))
-                except:
-                    policy_param_res = pickle.load(open(model_file_res, 'rb'), encoding='bytes')
-            policy_value_net_res = gomoku_zm.policy_value_net_mxnet.PolicyValueNet(self.height, self.width, batch_size=16, n_blocks=5, n_filter=128, model_params=policy_param_res)
-            self.mcts_player = gomoku_zm.mcts_alphaZero.MCTSPlayer(policy_value_net_res.policy_value_fn, c_puct=3, n_playout=1290)
-        # 10层残差
-        elif complex_ == 'r10':
-            if model_file_res10 is not None:
-                try:
-                    policy_param_res = pickle.load(open(model_file_res10, 'rb'))
-                except:
-                    policy_param_res = pickle.load(open(model_file_res10, 'rb'), encoding='bytes')
-            policy_value_net_res = gomoku_zm.policy_value_net_mxnet.PolicyValueNet(self.height, self.width, batch_size=16, n_blocks=10, n_filter=128, model_params=policy_param_res)
-            self.mcts_player = gomoku_zm.mcts_alphaZero.MCTSPlayer(policy_value_net_res.policy_value_fn, c_puct=3, n_playout=990)
+            self.mcts_player = gomoku_zm.mcts_alphaZero.MCTSPlayer(policy_value_net_res.policy_value_fn, c_puct=1, n_playout=390)
         else:
-            print("*=*" * 20, ": 模型参数错误")
+            print("*=*" * 20)
+            print("=*=" * 20)
+            print('模型参数错误')
         self.board = gomoku_zm.game.Board(width=self.width, height=self.height, n_in_row=5)
         self.board.init_board(startplayer)
         self.game = gomoku_zm.game.Game(self.board)
@@ -234,13 +226,12 @@ def go_play():
     import argparse
     import time
     parser = argparse.ArgumentParser()
-    # yixin_XX_X 格式将会进入和yixin的对战中
     temp_room_name = 'yixin_anxingle_' + str(time.time())
     parser.add_argument('--room_name', type=str, default=temp_room_name)
     parser.add_argument('--cur_role', default=1)
     parser.add_argument('--model', default='s')
     print('room_name:  ', temp_room_name)
-    parser.add_argument('--server_url', default='http://127.0.0.1:8888')
+    parser.add_argument('--server_url', default='http://120.132.59.147:11111')
     parser.add_argument('--ai', default='random')
     args = parser.parse_args()
 

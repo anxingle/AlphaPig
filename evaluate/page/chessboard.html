@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+{% from Hall import GameRoom %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GobangBoard</title>
+    <script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+
+</head>
+<body>
+
+<div>
+    <div>
+        <span id="username">{{username}}</span>
+        , <a href="/login?action=logout">退出登录</a>.
+        房间号:<input type="text" id="join_room_id_text" name="join_room_id" value="">
+        <button id="join_room_button">进入</button>
+    </div>
+
+    <div style=""></div>
+    {% if room %}
+
+    <script type="text/javascript">
+        var GLOBAL_room_status={{room.get_status()}};  //room_status 游戏状态 0异常 1等待加入 2开始游戏 3正在游戏 4已经结束
+        var GLOBAL_user_game_status={{user.game_status}};    //user_game_status 用户参加状态 0未参加游戏 1正在参加游戏
+        var GLOBAL_user_role={{user.game_role}};        //user_role 用户角色  0,-1未参与游戏  1黑方 2白方
+        var GLOBAL_current_role={{chess_board.get_current_user()}}; //current_role 当前行动角色 0黑方 1白方
+        var GLOBAL_ask_take_back={{room.ask_take_back}};
+
+
+
+
+    </script>
+    <div>
+        你已经进入 {{room.room_id}} 房间,本房间共有{{len(room.users)}}位用户：
+        {% for muser in room.users %}
+        | {{muser.uid}}
+        {% end %}
+    </div>
+    <div>
+        当前黑方为：
+        {% if 1 in room.position2users %}
+        {{room.position2users[1].uid}}
+        {% else%}
+        空，
+        {% if user.game_role<=0 %}
+        <button class="join_game_button" position="1">加入黑棋</button>
+        {% end %}
+        {% end %}
+        ,当前白方为：
+        {% if 2 in room.position2users %}
+        {{room.position2users[2].uid}}
+        {% else%}
+        空，
+        {% if user.game_role<=0 %}
+        <button class="join_game_button" position="2">加入白棋</button>
+        {% end %}
+        {% end %}
+        {% if 1 not in room.position2users and 2 not in room.position2users and user.game_role<=0%}
+        <button class="join_game_button" position="0">加入随机角色</button>
+        {% end %}
+
+    </div>
+    <div>
+        <div>
+            <style>
+                .qipan_block{
+                    background-repeat: no-repeat;
+                    background-position-x: center;
+                    background-position-y: center;
+                    background-size: 34px 34px;
+                }
+                .qipan_block_blank{
+                                    background-image: url(/static/blank.png);
+                }
+                .qipan_block_black{
+                                    background-image: url(/static/black.png);
+                }
+                .qipan_block_white{
+                                    background-image: url(/static/white.png);
+                }
+
+                .GameRoomStatus{
+                   font-size:30px;
+                }
+                .game_status_banner_yourturn{
+                    background-color: red;
+                }
+
+
+
+
+
+            </style>
+            <div>
+                功能:
+                {% if room.get_status()==GameRoom.ROOM_STATUS_PLAYING and room.ask_take_back==0 and (user.game_role==1 or user.game_role==2) %}
+                <button class="ask_take_back_button">申请悔棋</button>
+                {% end %}
+
+                {% if room.get_status()==GameRoom.ROOM_STATUS_FINISH and (user.game_role==1 or user.game_role==2) %}
+                <button class="reset_room_button">重新开始</button>
+                {% end %}
+
+
+            </div>
+            <div class="GameRoomStatus">
+                {% set winner_name="黑方" if chess_board.get_winner()==1 else "白方" %}
+                {% set current_name="黑方" if chess_board.get_current_user()==1 else "白方" %}
+                {% if room.get_status()==GameRoom.ROOM_STATUS_NOONE or \
+                room.get_status()==GameRoom.ROOM_STATUS_ONEWAITING %}
+                等待选手加入游戏.
+                {% elif room.get_status()==GameRoom.ROOM_STATUS_PLAYING %}
+
+                {% if chess_board.get_current_user()==user.game_role %}
+                <span class="game_status_banner game_status_banner_yourturn">当前轮到你行动</span>
+                {% elif user.game_role<=0 %}
+                当前轮到{{current_name}}行动
+                {% else %}
+                请等待对方下子
+                {% end %}
+
+                {% elif room.get_status()==GameRoom.ROOM_STATUS_FINISH %}
+                游戏结束，{{winner_name}}获胜。
+                {% end %}
+
+
+            </div>
+
+            <input type="hidden" id="status_signature" status_signature={{room.get_signature()}}>
+
+            <table border="0" cellpadding="0" cellspacing="0"
+                   style="border-spacing: 0px;border-collapse:collapse;border-style:none">
+                {% for i in range(chess_board.SIZE) %}
+                <tr>
+
+                    {% for j in range(chess_board.SIZE) %}
+                    {% if chess_board.get_piece(i, j)==0 %}
+                    <td height="34" width="34" class="qipan_block qipan_block_blank chess_piece_button" piece_i="{{i}}"
+                        piece_j={{j}}></td>
+                    {% elif chess_board.get_piece(i, j)==1 %}
+                    <td height="34" width="34" class="qipan_block qipan_block_black">
+                        {% if i== chess_board.get_lastmove()[-2] and j== chess_board.get_lastmove()[-1]%}
+                        <span style="color: white">Last</span>
+                        {% end %}
+                    </td>
+                    {% elif chess_board.get_piece(i , j)==2 %}
+                    <td height="34" width="34" class="qipan_block qipan_block_white">
+                        {% if i== chess_board.get_lastmove()[-2] and j== chess_board.get_lastmove()[-1]%}
+                        <span style="color: black">Last</span>
+                        {% end %}
+                    </td>
+                    {% else %}
+                    not legal {{chess_board.get_piece(i , j)}}
+                    {% end%}
+                    {% end%}
+                </tr>
+                {% end%}
+            </table>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        function send_post_and_redirect(url,data){
+            $.post(url,data,function(data,status){
+            var jsondata=eval(data);
+            if(jsondata["id"]==0){
+                $(location).attr('href', '/');
+            }else{
+                alert(jsondata["info"]);
+            }
+            });
+        }
+
+            $(document).ready(function(){
+                  function check_last_move(){
+
+                       $.post("/action?action=gameaction",
+                        {
+                            actionid: "get_status_signature",
+                            },function(data,status){
+                        var jsondata=eval(data);
+                        if(jsondata["id"]==0){
+                            var signature=jsondata["info"];
+                            var current_signature=$("#status_signature").attr("status_signature");
+                            if(signature!=current_signature){
+                                $(location).attr('href', '/');
+                            }
+                        }else{
+                            $(location).attr('href', '/');
+                        }
+                        });
+                  }
+                  setInterval(check_last_move,500);
+
+                  $(".chess_piece_button").click(function(){
+                    if(GLOBAL_room_status!=3)
+                      return;
+
+                    if(GLOBAL_user_game_status!=1)
+                      return;
+
+                    piece_i_value=$(this).attr("piece_i");
+                    piece_j_value=$(this).attr("piece_j");
+                    $.post("/action?action=gameaction",
+                    {
+                        actionid: "put_piece",
+                        piece_i:  piece_i_value,
+                        piece_j:  piece_j_value,
+                        },function(data,status){
+                    var jsondata=eval(data);
+                    if(jsondata["id"]==0){
+                        $(location).attr('href', '/');
+                    }else{
+                        alert("非法行子或不是你的回合。"+jsondata["info"]);
+                    }
+                    });
+                  });
+
+
+                $(".qipan_block_blank").hover(function(){
+                    if(GLOBAL_room_status!=3)
+                      return;
+                    if(GLOBAL_user_game_status!=1)
+                      return;
+                    if(GLOBAL_current_role!=GLOBAL_user_role)
+                      return;
+                    if(GLOBAL_user_role==1){
+                        $(this).removeClass("qipan_block_blank");
+                        $(this).addClass("qipan_block_black");
+                    }else if(GLOBAL_user_role==2){
+                        $(this).removeClass("qipan_block_blank");
+                        $(this).addClass("qipan_block_white");
+                    }
+                },function(){
+                    if(GLOBAL_room_status!=3)
+                      return;
+                    if(GLOBAL_user_game_status!=1)
+                      return;
+                    if(GLOBAL_current_role!=GLOBAL_user_role)
+                      return;
+                    if(GLOBAL_user_role==1){
+                        $(this).removeClass("qipan_block_black");
+                        $(this).addClass("qipan_block_blank");
+                    }else if(GLOBAL_user_role==2){
+                        $(this).removeClass("qipan_block_white");
+                        $(this).addClass("qipan_block_blank");
+                    }
+                });
+                  $(".join_game_button").click(function(){
+                    var join_game_position=$(this).attr("position");
+                    send_post_and_redirect("/action?action=joingame",{position:join_game_position,});
+                  });
+
+                  $(".ask_take_back_button").click(function(){
+                    send_post_and_redirect("/action?action=gameaction",{actionid: "ask_take_back",});
+                  });
+
+
+                  if((GLOBAL_ask_take_back==1 && GLOBAL_user_role==2)||(GLOBAL_ask_take_back==2 && GLOBAL_user_role==1)){
+                       var agreed=false;
+                       if(confirm("对方要求悔棋，是否同意？"))
+                            agreed=true;
+                       else
+                            agreed=false;
+
+                       send_post_and_redirect("/action?action=gameaction",
+                        {
+                            actionid: "answer_take_back",
+                            agree: agreed,
+                       });
+
+                  }
+
+                  $(".reset_room_button").click(function(){
+                    send_post_and_redirect("/action?action=reset_room",{});
+                  });
+            });
+
+
+
+
+    </script>
+
+
+    {% end%}
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#join_room_button").click(function(){
+
+    if($("#join_room_id_text").val()==""){
+        alert("No room id be input.");
+        return;
+    }
+    $.post("/action?action=joinroom",
+    {
+        roomid: $("#join_room_id_text").val(),
+    },function(data,status){
+    var jsondata=eval(data);
+    if(jsondata["id"]==0){
+        //alert(jsondata["info"]);
+        $(location).attr('href', '/');
+    }else{
+        alert(jsondata["info"]);
+    }
+    //alert("Data: " + jsondata["id"] + "\nStatus: " + status);
+
+    });
+  });
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
