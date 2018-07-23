@@ -4,3 +4,4 @@ __pycache__/
 *.swo
 *.sgf
 *.model
+policy_value_loss.json
