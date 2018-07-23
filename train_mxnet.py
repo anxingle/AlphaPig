@@ -73,7 +73,7 @@ class TrainPipeline():
         # 加载人类对弈数据
         self._load_training_data(self._sgf_home)
         # 加载保存的自对弈数据
-        self._load_pickle_data(self._ai_data_home)
+        # self._load_pickle_data(self._ai_data_home)
         if init_model:
             # start training from an initial policy-value net
             self.policy_value_net = PolicyValueNet(self.board_width,
@@ -100,15 +100,17 @@ class TrainPipeline():
         random.shuffle(self._training_data)
         self._length_train_data = len(self._training_data)
 
+    """"
     def _load_pickle_data(self, data_dir):
         file_list = os.listdir(data_dir)
         txt_list = [item for item in file_list if item.endswith('.txt') and os.path.isfile(os.path.join(data_dir, item))]
         self._ai_history_data = []
         for txt_f in txt_list:
-            f_object = open(os.path.join(data_dir, txt_f), 'rb')
-            d = pickle.load(f_object)
-            self._ai_history_data += d
-            f_object.close()
+            with open(os.path.join(data_dir, txt_f), 'rb') as f_object:
+                d = pickle.load(f_object)
+                self._ai_history_data += d
+                f_object.close()
+    """
 
     def get_equi_data(self, play_data):
         """augment the data set by rotation and flipping
@@ -151,8 +153,9 @@ class TrainPipeline():
                 self.data_buffer.extend(play_data)
         _logger.info('game_batch_index: %s, length of data_buffer: %s' % (training_index, len(self.data_buffer)))
 
+    """
     def collect_selfplay_data_pickle(self, n_games=1, training_index=None):
-        """ 使用pickle保存的曾经的对弈数据 """
+        # load AI self play data(auto save for every N game play nums)
         data_index = training_index % len(self._ai_history_data)
         if data_index == 0:
             random.shuffle(self._ai_history_data)
@@ -162,6 +165,7 @@ class TrainPipeline():
             # augment the data
             play_data = self.get_equi_data(play_data)
             self.data_buffer.extend(play_data)
+    """
 
     def collect_selfplay_data_ai(self, n_games=1, training_index=None):
         """collect AI self-play data for training"""
@@ -174,14 +178,10 @@ class TrainPipeline():
             # augment the data
             play_data = self.get_equi_data(play_data)
             self.data_buffer.extend(play_data)
-        #print(len(self.data_buffer), n_games)
 
     # def _multiprocess_collect_selfplay_data(self, q, process_index):
     #     """
-    #     多进程自对弈收集数据
-    #     Args:
-    #         q: 队列，保存结果
-    #     """
+    #     TODO: CUDA multiprocessing have bugs!
     #     winner, play_data = self.game.start_self_play(self.mcts_player,
     #                                                       temp=self.temp)
     #     play_data = list(play_data)[:]
@@ -267,17 +267,8 @@ class TrainPipeline():
         try:
             for i in range(self.game_batch_num):
                 current_time = time.time()
-                if i < 2000:
-                    self.collect_selfplay_data_pickle(1, training_index=i)
-                elif i < 7000:
+                if i < 4000:
                     self.collect_selfplay_data(1, training_index=i)
-                elif i < 12000:
-                    if i%8 == 0 or i%8 == 4:
-                        self.collect_selfplay_data_pickle(1, training_index=i)
-                    elif i % 8 == 3:
-                        self.collect_selfplay_data(1, training_index=i)
-                    else:
-                        self.collect_selfplay_data_ai(1, training_index=i)
                 else:
                     self.collect_selfplay_data_ai(1, training_index=i)
                 _logger.info('collection cost time: %d ' % (time.time() - current_time))
