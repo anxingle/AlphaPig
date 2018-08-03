@@ -21,7 +21,7 @@
 
 + 或者进入 train_mxnet.py 修改网络结构等参数，其中conf下的.yaml为训练定义的一些参数，可修改为适合自己的相关参数。
 
-+  SGF格式详解
++ SGF格式详解
 
   ```
   FF[4] SGF格式的版本号，4是最新
@@ -53,6 +53,13 @@
   对弈例子:
 
   <img src="http://p324ywv2g.bkt.clouddn.com/test.jpg" height="400px" />
+
++ 下载我训练的一些模型（还有很多bug）
+
+  ```
+  cd AlphaPig/logs
+  sh ./download_model.sh 
+  ```
 
 ## 致谢
 
