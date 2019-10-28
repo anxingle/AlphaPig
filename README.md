@@ -53,7 +53,8 @@
   对弈例子:
 
   <img src="https://raw.githubusercontent.com/anxingle/Exam/master/pic/alphaPig/test.jpg" height="400px" />
-  ![]((/public/img/ML/test.jpg))
+
+<img src="https://raw.githubusercontent.com/anxingle/anxingle.github.io/master/public/img/ML/test.jpg" />
 
 + 下载我训练的一些模型（还有很多bug）
 
