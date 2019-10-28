@@ -53,6 +53,7 @@
   对弈例子:
 
   <img src="https://raw.githubusercontent.com/anxingle/Exam/master/pic/alphaPig/test.jpg" height="400px" />
+  ![]((/public/img/ML/test.jpg))
 
 + 下载我训练的一些模型（还有很多bug）
 
@@ -70,4 +71,5 @@
 + 感谢[Uloud](https://www.ucloud.cn/) 提供的P40 AI-train服务，1256小时/实例的训练，验证了不少想法。而且最后还免单了，中间没少打扰技术支持。特别感谢他们。
 
   <img src="https://raw.githubusercontent.com/anxingle/Exam/master/pic/alphaPig/test2.jpg" width="500px">
+  ![](/public/img/ML/test2.jpg)
 
