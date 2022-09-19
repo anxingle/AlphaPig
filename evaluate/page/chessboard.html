@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GobangBoard</title>
+    <title>Alpha猪</title>
     <script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
 
 </head>
@@ -95,7 +95,7 @@
             <div>
                 功能:
                 {% if room.get_status()==GameRoom.ROOM_STATUS_PLAYING and room.ask_take_back==0 and (user.game_role==1 or user.game_role==2) %}
-                <button class="ask_take_back_button">申请悔棋</button>
+                <button disabled="disabled" class="ask_take_back_button">勿动(暂不可用)</button>
                 {% end %}
 
                 {% if room.get_status()==GameRoom.ROOM_STATUS_FINISH and (user.game_role==1 or user.game_role==2) %}
@@ -122,6 +122,12 @@
 
                 {% elif room.get_status()==GameRoom.ROOM_STATUS_FINISH %}
                 游戏结束，{{winner_name}}获胜。
+                <script type="text/javascript">
+                setTimeout(function() {
+                        send_post_and_redirect("/action?action=reset_room",{});
+                    }, 3500);
+                </script>
+
                 {% end %}
 
 

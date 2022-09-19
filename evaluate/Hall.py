@@ -2,6 +2,7 @@ import sys
 
 from ChessBoard import ChessBoard
 import cPickle as pickle
+# import _pickle as pickle
 import random
 import string
 import os

@@ -1,0 +1,31 @@
+version: "2.3"
+
+services:
+  gobang_server:
+    image: gospelslave/alphapig:v0.1.11
+    entrypoint: /bin/bash run_server.sh
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 8888:8888
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "5"
+
+  gobang_ai:
+    image: gospelslave/alphapig:v0.1.11
+    entrypoint: /bin/bash run_ai.sh
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    runtime: nvidia
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "5"

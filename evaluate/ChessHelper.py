@@ -21,14 +21,14 @@ def printBoard(chessboard):
     for i in range(chessboard.SIZE + 1):
         for j in range(chessboard.SIZE + 1):
             if i == 0 and j == 0:
-                print ' ',
+                print(' ')
             elif i == 0:
-                print numToAlp(j - 1),
+                print(numToAlp(j - 1))
             elif j == 0:
-                print numToAlp(i - 1),
+                print(numToAlp(i - 1))
             else:
-                print transferSymbol(chessboard.get_piece(i - 1, j - 1)),
-        print
+                print(transferSymbol(chessboard.get_piece(i - 1, j - 1)))
+        print()
 
 def printBoard2Str(chessboard):
     info_array=[]
@@ -87,7 +87,7 @@ if __name__ == '__main__':
                 cb = ChessBoard()
                 playRandomGame(cb)
                 oi += cb.move_num
-            print oi / num
+            print(oi / num)
 
         lp_wrapper = lp(playMuch)
         lp_wrapper(1000)

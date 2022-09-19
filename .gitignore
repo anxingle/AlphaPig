@@ -5,3 +5,4 @@ __pycache__/
 *.sgf
 *.model
 policy_value_loss.json
+evaluate/chess_output/

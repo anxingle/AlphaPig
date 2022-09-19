@@ -3,134 +3,163 @@
     {
       "op": "null", 
       "name": "input_labels", 
-      "attrs": {"__shape__": "(11776, 1)"}, 
+      "attrs": {"__shape__": "(128, 1)"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
       "name": "input_states", 
-      "attrs": {"__shape__": "(11776, 9, 15, 15)"}, 
+      "attrs": {"__shape__": "(128, 9, 15, 15)"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv1_weight", 
+      "name": "res_conv1_weight", 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv1_bias", 
+      "name": "res_conv1_bias", 
       "inputs": []
     }, 
     {
       "op": "Convolution", 
-      "name": "conv1", 
+      "name": "res_conv1", 
       "attrs": {
         "kernel": "(3, 3)", 
-        "num_filter": "64", 
+        "num_filter": "128", 
         "pad": "(1, 1)"
       }, 
       "inputs": [[1, 0, 0], [2, 0, 0], [3, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv1_gamma", 
+      "name": "res_conv1_gamma", 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv1_beta", 
+      "name": "res_conv1_beta", 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv1_mean", 
+      "name": "res_conv1_mean", 
       "attrs": {"__init__": "[\"zero\", {}]"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv1_var", 
+      "name": "res_conv1_var", 
       "attrs": {"__init__": "[\"one\", {}]"}, 
       "inputs": []
     }, 
     {
       "op": "BatchNorm", 
-      "name": "conv1_bn", 
+      "name": "res_conv1_bn", 
       "inputs": [[4, 0, 0], [5, 0, 0], [6, 0, 0], [7, 0, 1], [8, 0, 1]]
     }, 
     {
       "op": "Activation", 
-      "name": "conv1_act", 
+      "name": "res_conv1_act", 
       "attrs": {"act_type": "relu"}, 
       "inputs": [[9, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv2_weight", 
+      "name": "convA1_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv2_bias", 
+      "name": "convA1_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
       "inputs": []
     }, 
     {
       "op": "Convolution", 
-      "name": "conv2", 
+      "name": "convA1", 
       "attrs": {
         "kernel": "(3, 3)", 
-        "num_filter": "64", 
+        "num_filter": "128", 
         "pad": "(1, 1)"
       }, 
       "inputs": [[10, 0, 0], [11, 0, 0], [12, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv2_gamma", 
+      "name": "bnA1_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv2_beta", 
+      "name": "bnA1_beta", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv2_mean", 
-      "attrs": {"__init__": "[\"zero\", {}]"}, 
+      "name": "bnA1_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv2_var", 
-      "attrs": {"__init__": "[\"one\", {}]"}, 
+      "name": "bnA1_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "BatchNorm", 
-      "name": "conv2_bn", 
+      "name": "bnA1", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": [[13, 0, 0], [14, 0, 0], [15, 0, 0], [16, 0, 1], [17, 0, 1]]
     }, 
     {
       "op": "Activation", 
-      "name": "conv2_act", 
+      "name": "actA1", 
       "attrs": {"act_type": "relu"}, 
       "inputs": [[18, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv3_weight", 
+      "name": "convB1_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv3_bias", 
+      "name": "convB1_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
       "inputs": []
     }, 
     {
       "op": "Convolution", 
-      "name": "conv3", 
+      "name": "convB1", 
       "attrs": {
         "kernel": "(3, 3)", 
         "num_filter": "128", 
@@ -140,195 +169,1391 @@
     }, 
     {
       "op": "null", 
-      "name": "conv3_gamma", 
+      "name": "bnB1_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv3_beta", 
+      "name": "bnB1_beta", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv3_mean", 
-      "attrs": {"__init__": "[\"zero\", {}]"}, 
+      "name": "bnB1_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv3_var", 
-      "attrs": {"__init__": "[\"one\", {}]"}, 
+      "name": "bnB1_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "BatchNorm", 
-      "name": "conv3_bn", 
+      "name": "bnB1", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": [[22, 0, 0], [23, 0, 0], [24, 0, 0], [25, 0, 1], [26, 0, 1]]
     }, 
     {
+      "op": "elemwise_add", 
+      "name": "_plus0", 
+      "inputs": [[27, 0, 0], [10, 0, 0]]
+    }, 
+    {
       "op": "Activation", 
-      "name": "conv3_act", 
+      "name": "actB1", 
       "attrs": {"act_type": "relu"}, 
-      "inputs": [[27, 0, 0]]
+      "inputs": [[28, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv4_weight", 
-      "inputs": []
-    }, 
-    {
-      "op": "null", 
-      "name": "conv4_bias", 
-      "inputs": []
-    }, 
-    {
-      "op": "Convolution", 
-      "name": "conv4", 
+      "name": "convA2_weight", 
       "attrs": {
         "kernel": "(3, 3)", 
         "num_filter": "128", 
         "pad": "(1, 1)"
       }, 
-      "inputs": [[28, 0, 0], [29, 0, 0], [30, 0, 0]]
-    }, 
-    {
-      "op": "null", 
-      "name": "conv4_gamma", 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv4_beta", 
-      "inputs": []
-    }, 
-    {
-      "op": "null", 
-      "name": "conv4_mean", 
-      "attrs": {"__init__": "[\"zero\", {}]"}, 
-      "inputs": []
-    }, 
-    {
-      "op": "null", 
-      "name": "conv4_var", 
-      "attrs": {"__init__": "[\"one\", {}]"}, 
-      "inputs": []
-    }, 
-    {
-      "op": "BatchNorm", 
-      "name": "conv4_bn", 
-      "inputs": [[31, 0, 0], [32, 0, 0], [33, 0, 0], [34, 0, 1], [35, 0, 1]]
-    }, 
-    {
-      "op": "Activation", 
-      "name": "conv4_act", 
-      "attrs": {"act_type": "relu"}, 
-      "inputs": [[36, 0, 0]]
-    }, 
-    {
-      "op": "null", 
-      "name": "conv5_weight", 
-      "inputs": []
-    }, 
-    {
-      "op": "null", 
-      "name": "conv5_bias", 
+      "name": "convA2_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
       "inputs": []
     }, 
     {
       "op": "Convolution", 
-      "name": "conv5", 
+      "name": "convA2", 
       "attrs": {
         "kernel": "(3, 3)", 
-        "num_filter": "256", 
+        "num_filter": "128", 
         "pad": "(1, 1)"
       }, 
-      "inputs": [[37, 0, 0], [38, 0, 0], [39, 0, 0]]
+      "inputs": [[29, 0, 0], [30, 0, 0], [31, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv5_gamma", 
+      "name": "bnA2_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv5_beta", 
+      "name": "bnA2_beta", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv5_mean", 
-      "attrs": {"__init__": "[\"zero\", {}]"}, 
+      "name": "bnA2_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv5_var", 
-      "attrs": {"__init__": "[\"one\", {}]"}, 
+      "name": "bnA2_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "BatchNorm", 
-      "name": "conv5_bn", 
-      "inputs": [[40, 0, 0], [41, 0, 0], [42, 0, 0], [43, 0, 1], [44, 0, 1]]
+      "name": "bnA2", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[32, 0, 0], [33, 0, 0], [34, 0, 0], [35, 0, 1], [36, 0, 1]]
     }, 
     {
       "op": "Activation", 
-      "name": "conv5_act", 
+      "name": "actA2", 
       "attrs": {"act_type": "relu"}, 
-      "inputs": [[45, 0, 0]]
+      "inputs": [[37, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv_final_weight", 
+      "name": "convB2_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv_final_bias", 
+      "name": "convB2_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
       "inputs": []
     }, 
     {
       "op": "Convolution", 
-      "name": "conv_final", 
+      "name": "convB2", 
       "attrs": {
         "kernel": "(3, 3)", 
-        "num_filter": "256", 
+        "num_filter": "128", 
         "pad": "(1, 1)"
       }, 
-      "inputs": [[46, 0, 0], [47, 0, 0], [48, 0, 0]]
+      "inputs": [[38, 0, 0], [39, 0, 0], [40, 0, 0]]
     }, 
     {
       "op": "null", 
-      "name": "conv_final_gamma", 
+      "name": "bnB2_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv_final_beta", 
+      "name": "bnB2_beta", 
+      "attrs": {"fix_gamma": "False"}, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv_final_mean", 
-      "attrs": {"__init__": "[\"zero\", {}]"}, 
+      "name": "bnB2_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "null", 
-      "name": "conv_final_var", 
-      "attrs": {"__init__": "[\"one\", {}]"}, 
+      "name": "bnB2_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
       "inputs": []
     }, 
     {
       "op": "BatchNorm", 
-      "name": "conv_final_bn", 
-      "inputs": [[49, 0, 0], [50, 0, 0], [51, 0, 0], [52, 0, 1], [53, 0, 1]]
+      "name": "bnB2", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[41, 0, 0], [42, 0, 0], [43, 0, 0], [44, 0, 1], [45, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus1", 
+      "inputs": [[46, 0, 0], [29, 0, 0]]
     }, 
     {
       "op": "Activation", 
-      "name": "conv_final_act", 
+      "name": "actB2", 
       "attrs": {"act_type": "relu"}, 
-      "inputs": [[54, 0, 0]]
+      "inputs": [[47, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA3_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA3_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA3", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[48, 0, 0], [49, 0, 0], [50, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA3_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA3_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA3_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA3_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA3", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[51, 0, 0], [52, 0, 0], [53, 0, 0], [54, 0, 1], [55, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA3", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[56, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB3_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB3_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB3", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[57, 0, 0], [58, 0, 0], [59, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB3_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB3_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB3_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB3_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB3", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[60, 0, 0], [61, 0, 0], [62, 0, 0], [63, 0, 1], [64, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus2", 
+      "inputs": [[65, 0, 0], [48, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB3", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[66, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA4_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA4_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA4", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[67, 0, 0], [68, 0, 0], [69, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA4_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA4_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA4_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA4_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA4", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[70, 0, 0], [71, 0, 0], [72, 0, 0], [73, 0, 1], [74, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA4", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[75, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB4_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB4_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB4", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[76, 0, 0], [77, 0, 0], [78, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB4_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB4_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB4_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB4_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB4", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[79, 0, 0], [80, 0, 0], [81, 0, 0], [82, 0, 1], [83, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus3", 
+      "inputs": [[84, 0, 0], [67, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB4", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[85, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA5_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA5_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA5", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[86, 0, 0], [87, 0, 0], [88, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA5_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA5_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA5_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA5_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA5", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[89, 0, 0], [90, 0, 0], [91, 0, 0], [92, 0, 1], [93, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA5", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[94, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB5_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB5_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB5", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[95, 0, 0], [96, 0, 0], [97, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB5_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB5_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB5_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB5_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB5", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[98, 0, 0], [99, 0, 0], [100, 0, 0], [101, 0, 1], [102, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus4", 
+      "inputs": [[103, 0, 0], [86, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB5", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[104, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA6_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA6_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA6", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[105, 0, 0], [106, 0, 0], [107, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA6_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA6_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA6_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA6_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA6", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[108, 0, 0], [109, 0, 0], [110, 0, 0], [111, 0, 1], [112, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA6", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[113, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB6_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB6_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB6", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[114, 0, 0], [115, 0, 0], [116, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB6_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB6_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB6_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB6_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB6", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[117, 0, 0], [118, 0, 0], [119, 0, 0], [120, 0, 1], [121, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus5", 
+      "inputs": [[122, 0, 0], [105, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB6", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[123, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA7_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA7_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA7", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[124, 0, 0], [125, 0, 0], [126, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA7_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA7_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA7_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA7_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA7", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[127, 0, 0], [128, 0, 0], [129, 0, 0], [130, 0, 1], [131, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA7", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[132, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB7_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB7_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB7", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[133, 0, 0], [134, 0, 0], [135, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB7_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB7_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB7_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB7_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB7", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[136, 0, 0], [137, 0, 0], [138, 0, 0], [139, 0, 1], [140, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus6", 
+      "inputs": [[141, 0, 0], [124, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB7", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[142, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA8_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA8_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA8", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[143, 0, 0], [144, 0, 0], [145, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA8_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA8_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA8_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA8_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA8", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[146, 0, 0], [147, 0, 0], [148, 0, 0], [149, 0, 1], [150, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA8", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[151, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB8_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB8_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB8", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[152, 0, 0], [153, 0, 0], [154, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB8_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB8_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB8_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB8_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB8", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[155, 0, 0], [156, 0, 0], [157, 0, 0], [158, 0, 1], [159, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus7", 
+      "inputs": [[160, 0, 0], [143, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB8", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[161, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA9_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA9_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA9", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[162, 0, 0], [163, 0, 0], [164, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA9_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA9_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA9_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA9_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA9", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[165, 0, 0], [166, 0, 0], [167, 0, 0], [168, 0, 1], [169, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA9", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[170, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB9_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB9_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB9", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[171, 0, 0], [172, 0, 0], [173, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB9_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB9_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB9_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB9_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB9", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[174, 0, 0], [175, 0, 0], [176, 0, 0], [177, 0, 1], [178, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus8", 
+      "inputs": [[179, 0, 0], [162, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB9", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[180, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convA10_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convA10_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convA10", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[181, 0, 0], [182, 0, 0], [183, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA10_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA10_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA10_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnA10_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnA10", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[184, 0, 0], [185, 0, 0], [186, 0, 0], [187, 0, 1], [188, 0, 1]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actA10", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[189, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "convB10_weight", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "convB10_bias", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "Convolution", 
+      "name": "convB10", 
+      "attrs": {
+        "kernel": "(3, 3)", 
+        "num_filter": "128", 
+        "pad": "(1, 1)"
+      }, 
+      "inputs": [[190, 0, 0], [191, 0, 0], [192, 0, 0]]
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB10_gamma", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB10_beta", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB10_moving_mean", 
+      "attrs": {
+        "__init__": "[\"zero\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "null", 
+      "name": "bnB10_moving_var", 
+      "attrs": {
+        "__init__": "[\"one\", {}]", 
+        "fix_gamma": "False"
+      }, 
+      "inputs": []
+    }, 
+    {
+      "op": "BatchNorm", 
+      "name": "bnB10", 
+      "attrs": {"fix_gamma": "False"}, 
+      "inputs": [[193, 0, 0], [194, 0, 0], [195, 0, 0], [196, 0, 1], [197, 0, 1]]
+    }, 
+    {
+      "op": "elemwise_add", 
+      "name": "_plus9", 
+      "inputs": [[198, 0, 0], [181, 0, 0]]
+    }, 
+    {
+      "op": "Activation", 
+      "name": "actB10", 
+      "attrs": {"act_type": "relu"}, 
+      "inputs": [[199, 0, 0]]
     }, 
     {
       "op": "null", 
@@ -348,7 +1573,7 @@
         "num_filter": "2", 
         "pad": "(0, 0)"
       }, 
-      "inputs": [[55, 0, 0], [56, 0, 0], [57, 0, 0]]
+      "inputs": [[200, 0, 0], [201, 0, 0], [202, 0, 0]]
     }, 
     {
       "op": "null", 
@@ -375,24 +1600,24 @@
     {
       "op": "BatchNorm", 
       "name": "conv3_2_1_bn", 
-      "inputs": [[58, 0, 0], [59, 0, 0], [60, 0, 0], [61, 0, 1], [62, 0, 1]]
+      "inputs": [[203, 0, 0], [204, 0, 0], [205, 0, 0], [206, 0, 1], [207, 0, 1]]
     }, 
     {
       "op": "Activation", 
       "name": "conv3_2_1_act", 
       "attrs": {"act_type": "relu"}, 
-      "inputs": [[63, 0, 0]]
+      "inputs": [[208, 0, 0]]
     }, 
     {
       "op": "Flatten", 
       "name": "flatten1", 
-      "inputs": [[64, 0, 0]]
+      "inputs": [[209, 0, 0]]
     }, 
     {
       "op": "Dropout", 
       "name": "dropout1", 
       "attrs": {"p": "0.5"}, 
-      "inputs": [[65, 0, 0]]
+      "inputs": [[210, 0, 0]]
     }, 
     {
       "op": "null", 
@@ -408,28 +1633,28 @@
       "op": "FullyConnected", 
       "name": "fc_3_2_1", 
       "attrs": {"num_hidden": "1"}, 
-      "inputs": [[66, 0, 0], [67, 0, 0], [68, 0, 0]]
+      "inputs": [[211, 0, 0], [212, 0, 0], [213, 0, 0]]
     }, 
     {
       "op": "Activation", 
       "name": "activation0", 
       "attrs": {"act_type": "tanh"}, 
-      "inputs": [[69, 0, 0]]
+      "inputs": [[214, 0, 0]]
     }, 
     {
       "op": "elemwise_sub", 
       "name": "_minus0", 
-      "inputs": [[0, 0, 0], [70, 0, 0]]
+      "inputs": [[0, 0, 0], [215, 0, 0]]
     }, 
     {
       "op": "square", 
       "name": "square0", 
-      "inputs": [[71, 0, 0]]
+      "inputs": [[216, 0, 0]]
     }, 
     {
       "op": "mean", 
       "name": "mean1", 
-      "inputs": [[72, 0, 0]]
+      "inputs": [[217, 0, 0]]
     }, 
     {
       "op": "null", 
@@ -449,7 +1674,7 @@
         "num_filter": "4", 
         "pad": "(0, 0)"
       }, 
-      "inputs": [[55, 0, 0], [74, 0, 0], [75, 0, 0]]
+      "inputs": [[200, 0, 0], [219, 0, 0], [220, 0, 0]]
     }, 
     {
       "op": "null", 
@@ -476,24 +1701,24 @@
     {
       "op": "BatchNorm", 
       "name": "conv3_1_1_bn", 
-      "inputs": [[76, 0, 0], [77, 0, 0], [78, 0, 0], [79, 0, 1], [80, 0, 1]]
+      "inputs": [[221, 0, 0], [222, 0, 0], [223, 0, 0], [224, 0, 1], [225, 0, 1]]
     }, 
     {
       "op": "Activation", 
       "name": "conv3_1_1_act", 
       "attrs": {"act_type": "relu"}, 
-      "inputs": [[81, 0, 0]]
+      "inputs": [[226, 0, 0]]
     }, 
     {
       "op": "Flatten", 
       "name": "flatten0", 
-      "inputs": [[82, 0, 0]]
+      "inputs": [[227, 0, 0]]
     }, 
     {
       "op": "Dropout", 
       "name": "dropout0", 
       "attrs": {"p": "0.5"}, 
-      "inputs": [[83, 0, 0]]
+      "inputs": [[228, 0, 0]]
     }, 
     {
       "op": "null", 
@@ -509,92 +1734,92 @@
       "op": "FullyConnected", 
       "name": "fc_3_1_1", 
       "attrs": {"num_hidden": "225"}, 
-      "inputs": [[84, 0, 0], [85, 0, 0], [86, 0, 0]]
+      "inputs": [[229, 0, 0], [230, 0, 0], [231, 0, 0]]
     }, 
     {
       "op": "SoftmaxActivation", 
-      "name": "softmaxactivation0", 
-      "inputs": [[87, 0, 0]]
+      "name": "Act_SILER", 
+      "inputs": [[232, 0, 0]]
     }, 
     {
       "op": "log", 
       "name": "log0", 
-      "inputs": [[88, 0, 0]]
+      "inputs": [[233, 0, 0]]
     }, 
     {
       "op": "null", 
       "name": "mcts_probs", 
-      "attrs": {"__shape__": "(11776, 225)"}, 
+      "attrs": {"__shape__": "(128, 225)"}, 
       "inputs": []
     }, 
     {
       "op": "elemwise_mul", 
       "name": "_mul0", 
-      "inputs": [[89, 0, 0], [90, 0, 0]]
+      "inputs": [[234, 0, 0], [235, 0, 0]]
     }, 
     {
       "op": "sum", 
       "name": "sum0", 
       "attrs": {"axis": "1"}, 
-      "inputs": [[91, 0, 0]]
+      "inputs": [[236, 0, 0]]
     }, 
     {
       "op": "_mul_scalar", 
       "name": "_mulscalar0", 
       "attrs": {"scalar": "-1.0"}, 
-      "inputs": [[92, 0, 0]]
+      "inputs": [[237, 0, 0]]
     }, 
     {
       "op": "mean", 
       "name": "mean0", 
-      "inputs": [[93, 0, 0]]
+      "inputs": [[238, 0, 0]]
     }, 
     {
       "op": "elemwise_add", 
-      "name": "_plus0", 
-      "inputs": [[73, 0, 0], [94, 0, 0]]
+      "name": "_plus10", 
+      "inputs": [[218, 0, 0], [239, 0, 0]]
     }, 
     {
       "op": "MakeLoss", 
       "name": "makeloss0", 
-      "inputs": [[95, 0, 0]]
+      "inputs": [[240, 0, 0]]
     }, 
     {
       "op": "_mul_scalar", 
       "name": "_mulscalar1", 
       "attrs": {"scalar": "-1.0"}, 
-      "inputs": [[88, 0, 0]]
+      "inputs": [[233, 0, 0]]
     }, 
     {
       "op": "log", 
       "name": "log1", 
-      "inputs": [[88, 0, 0]]
+      "inputs": [[233, 0, 0]]
     }, 
     {
       "op": "elemwise_mul", 
       "name": "_mul1", 
-      "inputs": [[97, 0, 0], [98, 0, 0]]
+      "inputs": [[242, 0, 0], [243, 0, 0]]
     }, 
     {
       "op": "sum", 
       "name": "sum1", 
       "attrs": {"axis": "1"}, 
-      "inputs": [[99, 0, 0]]
+      "inputs": [[244, 0, 0]]
     }, 
     {
       "op": "mean", 
       "name": "mean2", 
-      "inputs": [[100, 0, 0]]
+      "inputs": [[245, 0, 0]]
     }, 
     {
       "op": "BlockGrad", 
       "name": "blockgrad0", 
-      "inputs": [[101, 0, 0]]
+      "inputs": [[246, 0, 0]]
     }, 
     {
       "op": "MakeLoss", 
       "name": "makeloss1", 
-      "inputs": [[102, 0, 0]]
+      "inputs": [[247, 0, 0]]
     }
   ], 
   "arg_nodes": [
@@ -618,41 +1843,131 @@
     24, 
     25, 
     26, 
-    29, 
     30, 
-    32, 
+    31, 
     33, 
     34, 
     35, 
-    38, 
+    36, 
     39, 
-    41, 
+    40, 
     42, 
     43, 
     44, 
-    47, 
-    48, 
+    45, 
+    49, 
     50, 
-    51, 
     52, 
     53, 
-    56, 
-    57, 
+    54, 
+    55, 
+    58, 
     59, 
-    60, 
     61, 
     62, 
-    67, 
+    63, 
+    64, 
     68, 
+    69, 
+    71, 
+    72, 
+    73, 
     74, 
-    75, 
     77, 
     78, 
-    79, 
     80, 
-    85, 
-    86, 
-    90
+    81, 
+    82, 
+    83, 
+    87, 
+    88, 
+    90, 
+    91, 
+    92, 
+    93, 
+    96, 
+    97, 
+    99, 
+    100, 
+    101, 
+    102, 
+    106, 
+    107, 
+    109, 
+    110, 
+    111, 
+    112, 
+    115, 
+    116, 
+    118, 
+    119, 
+    120, 
+    121, 
+    125, 
+    126, 
+    128, 
+    129, 
+    130, 
+    131, 
+    134, 
+    135, 
+    137, 
+    138, 
+    139, 
+    140, 
+    144, 
+    145, 
+    147, 
+    148, 
+    149, 
+    150, 
+    153, 
+    154, 
+    156, 
+    157, 
+    158, 
+    159, 
+    163, 
+    164, 
+    166, 
+    167, 
+    168, 
+    169, 
+    172, 
+    173, 
+    175, 
+    176, 
+    177, 
+    178, 
+    182, 
+    183, 
+    185, 
+    186, 
+    187, 
+    188, 
+    191, 
+    192, 
+    194, 
+    195, 
+    196, 
+    197, 
+    201, 
+    202, 
+    204, 
+    205, 
+    206, 
+    207, 
+    212, 
+    213, 
+    219, 
+    220, 
+    222, 
+    223, 
+    224, 
+    225, 
+    230, 
+    231, 
+    235
   ], 
   "node_row_ptr": [
     0, 
@@ -692,7 +2007,7 @@
     40, 
     41, 
     42, 
-    45, 
+    43, 
     46, 
     47, 
     48, 
@@ -701,7 +2016,7 @@
     51, 
     52, 
     53, 
-    56, 
+    54, 
     57, 
     58, 
     59, 
@@ -710,8 +2025,8 @@
     62, 
     63, 
     64, 
-    67, 
-    68, 
+    65, 
+    66, 
     69, 
     70, 
     71, 
@@ -719,9 +2034,10 @@
     73, 
     74, 
     75, 
-    78, 
-    79, 
+    76, 
+    77, 
     80, 
+    81, 
     82, 
     83, 
     84, 
@@ -730,16 +2046,15 @@
     87, 
     88, 
     89, 
-    90, 
-    91, 
     92, 
     93, 
     94, 
     95, 
     96, 
+    97, 
+    98, 
     99, 
     100, 
-    101, 
     103, 
     104, 
     105, 
@@ -750,8 +2065,6 @@
     110, 
     111, 
     112, 
-    113, 
-    114, 
     115, 
     116, 
     117, 
@@ -759,8 +2072,155 @@
     119, 
     120, 
     121, 
-    122
+    122, 
+    123, 
+    126, 
+    127, 
+    128, 
+    129, 
+    130, 
+    131, 
+    132, 
+    133, 
+    134, 
+    135, 
+    138, 
+    139, 
+    140, 
+    141, 
+    142, 
+    143, 
+    144, 
+    145, 
+    146, 
+    149, 
+    150, 
+    151, 
+    152, 
+    153, 
+    154, 
+    155, 
+    156, 
+    157, 
+    158, 
+    161, 
+    162, 
+    163, 
+    164, 
+    165, 
+    166, 
+    167, 
+    168, 
+    169, 
+    172, 
+    173, 
+    174, 
+    175, 
+    176, 
+    177, 
+    178, 
+    179, 
+    180, 
+    181, 
+    184, 
+    185, 
+    186, 
+    187, 
+    188, 
+    189, 
+    190, 
+    191, 
+    192, 
+    195, 
+    196, 
+    197, 
+    198, 
+    199, 
+    200, 
+    201, 
+    202, 
+    203, 
+    204, 
+    207, 
+    208, 
+    209, 
+    210, 
+    211, 
+    212, 
+    213, 
+    214, 
+    215, 
+    218, 
+    219, 
+    220, 
+    221, 
+    222, 
+    223, 
+    224, 
+    225, 
+    226, 
+    227, 
+    230, 
+    231, 
+    232, 
+    233, 
+    234, 
+    235, 
+    236, 
+    237, 
+    238, 
+    241, 
+    242, 
+    243, 
+    244, 
+    245, 
+    246, 
+    247, 
+    248, 
+    249, 
+    250, 
+    253, 
+    254, 
+    255, 
+    257, 
+    258, 
+    259, 
+    260, 
+    261, 
+    262, 
+    263, 
+    264, 
+    265, 
+    266, 
+    267, 
+    268, 
+    269, 
+    270, 
+    271, 
+    274, 
+    275, 
+    276, 
+    278, 
+    279, 
+    280, 
+    281, 
+    282, 
+    283, 
+    284, 
+    285, 
+    286, 
+    287, 
+    288, 
+    289, 
+    290, 
+    291, 
+    292, 
+    293, 
+    294, 
+    295, 
+    296, 
+    297
   ], 
-  "heads": [[96, 0, 0], [103, 0, 0]], 
-  "attrs": {"mxnet_version": ["int", 10100]}
+  "heads": [[241, 0, 0], [248, 0, 0]], 
+  "attrs": {"mxnet_version": ["int", 10501]}
 }

@@ -6,6 +6,53 @@
 2. [starimpact/AlphaZero_Gomoku](https://github.com/starimpact/AlphaZero_Gomoku)
 3. [yonghenglh6/GobangServer](https://github.com/yonghenglh6/GobangServer)
 
+
+### 快速启动
+
+```（确保本机安装docker/nvidia-docker）
+docker-compose up # (默认使用0号显卡，根据run_ai.sh 进行适配性修改)
+```
+
+对 run_ai.sh 进行修改后，修改docker-compose.yml：
+
+```
+version: "2.3"
+
+services:
+  gobang_server:
+    image: gospelslave/alphapig:v0.1.11
+    entrypoint: /bin/bash run_server.sh
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - $PWD/run_server.sh:/workspace/run_server.sh # 这里修改后的映射
+    ports:
+      - 8888:8888
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "5"
+
+  gobang_ai:
+    image: gospelslave/alphapig:v0.1.11
+    entrypoint: /bin/bash run_ai.sh
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - $PWD/run_ai.sh:/workspace/run_ai.sh  # 这里是修改后的映射
+    runtime: nvidia
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "5"
+```
+
 ### 上手入门
 + cd AlphaPig/sgf_data/
 
