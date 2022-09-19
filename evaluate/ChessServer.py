@@ -140,7 +140,7 @@ class LoginHandler(BaseHandler):
                 hall.logout(self.current_user)
 
             username = hall.login_in_guest()
-            print username
+            print(username)
             if username:
                 self.set_secure_cookie("username", username)
                 self.redirect("/")

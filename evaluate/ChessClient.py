@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import requests
 import cookielib
+# import http.cookiejar
 from bs4 import BeautifulSoup
 import json
 import time
 import cPickle as pickle
+# import _pickle as pickle
 import ChessHelper
 from ChessBoard import ChessBoard
 from Hall import GameRoom
@@ -114,7 +116,7 @@ class ChessClient():
                     self.last_status_signature = status_signature
                     break
             else:
-                print "ERROR get_status_signature,", action_result['id'], action_result['info']
+                print("ERROR get_status_signature,", action_result['id'], action_result['info'])
                 break
             time.sleep(interval)
             wait_time += interval
@@ -159,12 +161,20 @@ class GameStrategy_MZhang():
     def __init__(self, startplayer=0, complex_='s'):
         abs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
         # 普通卷积
+        """
         model_file2 = os.path.join(abs_path, './logs/current_policy_tf_small.model')
         model_file1 = os.path.join(abs_path, './logs/best_policy_tf_10999.model')
         model_file3 = os.path.join(abs_path, './logs/current_policy_1024.model')
         # 残差5层
         model_file_res = os.path.join(abs_path, './logs/current_res_5.model')
         model_file_res10 = os.path.join(abs_path, './logs/current_res_10.model')
+        """
+        model_file1 = os.path.join(abs_path, "./logs/current_policy.model")
+        model_file2 = os.path.join(abs_path, "./logs/current_policy.model")
+        model_file3 = os.path.join(abs_path, "./logs/current_policy.model")
+        model_file_res = os.path.join(abs_path, "./logs/current_policy.model")
+        model_file_res10 = os.path.join(abs_path, "./logs/current_policy.model")
+
         policy_param = None
         self.height = 15
         self.width = 15
@@ -177,7 +187,7 @@ class GameStrategy_MZhang():
 
         if complex_ == 's':
             policy_value_net = gomoku_zm.policy_value_net_mxnet_simple.PolicyValueNet(self.height, self.width, batch_size=16, model_params=policy_param)
-            self.mcts_player = gomoku_zm.mcts_alphaZero.MCTSPlayer(policy_value_net.policy_value_fn, c_puct=3, n_playout=160)
+            self.mcts_player = gomoku_zm.mcts_alphaZero.MCTSPlayer(policy_value_net.policy_value_fn, c_puct=3, n_playout=80) # n_playout: 160 太久了 改成 80
             # 500:50s  200:32s
         # 残差网络 5层
         elif complex_ == 'r':
@@ -230,26 +240,14 @@ class GameStrategy_MZhang():
 
 
 
-def go_play():
-    import argparse
-    import time
-    parser = argparse.ArgumentParser()
-    # yixin_XX_X 格式将会进入和yixin的对战中
-    temp_room_name = 'yixin_anxingle_' + str(time.time())
-    parser.add_argument('--room_name', type=str, default=temp_room_name)
-    parser.add_argument('--cur_role', default=1)
-    parser.add_argument('--model', default='s')
-    print('room_name:  ', temp_room_name)
-    parser.add_argument('--server_url', default='http://127.0.0.1:8888')
-    parser.add_argument('--ai', default='random')
-    args = parser.parse_args()
+def go_play(args):
 
     client = ChessClient(args.server_url)
     client.login_in_guest()
     client.join_room(args.room_name)
     client.join_game(args.cur_role)
     user = client.get_user_info()
-    print "加入游戏成功，你是:" + ("黑方" if user.game_role == 1 else "白方")
+    print("加入游戏成功，你是:" + ("黑方" if user.game_role == 1 else "白方"))
     print('model is:   ', args.model)
 
     if args.ai == 'random':
@@ -259,7 +257,7 @@ def go_play():
 
     while True:
         wait_time = client.wait_game_info_changed()
-        print 'wait_time:', wait_time
+        print('wait_time:', wait_time)
 
         room = client.get_room_info()
         # room=GameRoom()
@@ -268,37 +266,57 @@ def go_play():
         gameboard = client.get_game_info()
         # gameboard = ChessBoard()
 
-        print 'room.get_status():', room.get_status()
-        print 'user.game_status():', user.game_status
-        print 'gameboard.game_status():'
+        print('room.get_status():', room.get_status())
+        print('user.game_status():', user.game_status)
+        print('gameboard.game_status():')
         ChessHelper.printBoard(gameboard)
 
         if room.get_status() == GameRoom.ROOM_STATUS_NOONE or room.get_status() == GameRoom.ROOM_STATUS_ONEWAITING:
-            print "等待另一个对手加入游戏:"
+            print("等待另一个对手加入游戏:")
             continue
         elif room.get_status() == GameRoom.ROOM_STATUS_PLAYING:
             if room.ask_take_back != 0 and room.ask_take_back != user.game_role:
                 client.answer_take_back()
-                break
+                return 0
+                # break
             if gameboard.get_current_user() == user.game_role:
-                print "轮到你走："
+                print("轮到你走：")
                 current_time = time.time()
                 one_legal_piece = strategy.play_one_piece(user, gameboard)
                 action_result = client.put_piece(*one_legal_piece)
                 print('***' * 20)
                 print('COST TIME: %s' % (time.time() - current_time))
                 if action_result['id'] != 0:
-                    print "走棋失败:"
-                    print ChessHelper.numToAlp(one_legal_piece[0]), ChessHelper.numToAlp(one_legal_piece[1])
-                    print action_result['info']
+                    print("走棋失败:")
+                    print(ChessHelper.numToAlp(one_legal_piece[0]), ChessHelper.numToAlp(one_legal_piece[1]))
+                    print(action_result['info'])
 
             else:
-                print "轮到对手走...."
+                print("轮到对手走....")
             continue
         elif room.get_status() == GameRoom.ROOM_STATUS_FINISH:
-            print "游戏已经结束了," + ("黑方" if gameboard.get_winner() == 1 else "白方") + " 赢了"
-            break
+            print("游戏已经结束了," + ("黑方" if gameboard.get_winner() == 1 else "白方") + " 赢了")
+            return 1
+            # break
 
 
 if __name__ == "__main__":
-    go_play()
+    import argparse
+    import time
+    parser = argparse.ArgumentParser()
+    # yixin_XX_X 格式将会进入和yixin的对战中
+    temp_room_name = 'yixin_anxingle_' + str(time.time())
+    parser.add_argument('--room_name', type=str, default=temp_room_name)
+    parser.add_argument('--cur_role', default=1)
+    parser.add_argument('--model', default='s')
+    print('room_name:  ', temp_room_name)
+    parser.add_argument('--server_url', default='http://127.0.0.1:33512')
+    parser.add_argument('--ai', default='random')
+    args = parser.parse_args()
+    while True:
+        status = go_play(args)
+        if status == 1:
+            time.sleep(5)
+        else:
+            print("房间有人！")
+            time.sleep(10)
