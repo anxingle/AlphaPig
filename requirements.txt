@@ -1,6 +1,6 @@
 line_profiler==2.1.2
 requests==2.18.4
-numpy==1.14.2
+numpy==1.22.0
 beautifulsoup4==4.6.0
 PyYAML==3.13
 psyco
