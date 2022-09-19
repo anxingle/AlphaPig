@@ -2,7 +2,7 @@ line_profiler==2.1.2
 requests==2.18.4
 numpy==1.14.2
 beautifulsoup4==4.6.0
-PyYAML==3.13
+PyYAML==5.4
 psyco
 tornado
 mxnet==1.6.0
