@@ -4,6 +4,8 @@ echo "start for AI.." && source /workspace/dev.env/bin/activate
 export PATH=/usr/local/cuda-10.2/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64:$LD_LIBRARY_PATH
 sleep 5
+export CUDA_VISIBLE_DEVICES=1 # 设置使用的显卡
+echo "cuda device: ", $CUDA_VISIBLE_DEVICES
 cd /workspace/AlphaPig/evaluate/ && echo "run AI is OK "
 nohup python ChessClient.py --cur_role 1 --model r10 --room_name 1 --server_url http://gobang_server:8888 &
 nohup python ChessClient.py --cur_role 1 --model r10 --room_name 2 --server_url http://gobang_server:8888 &

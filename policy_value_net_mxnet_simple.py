@@ -8,7 +8,7 @@ Tested under Keras 2.0.5 with tensorflow-gpu 1.2.1 as backend
 from __future__ import print_function
 import sys
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 # sys.path.insert(0, '/home/mingzhang/work/dmlc/python_mxnet/python')
 
 import mxnet as mx
