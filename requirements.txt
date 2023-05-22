@@ -1,5 +1,5 @@
 line_profiler==2.1.2
-requests==2.18.4
+requests==2.31.0
 numpy==1.14.2
 beautifulsoup4==4.6.0
 PyYAML==3.13
